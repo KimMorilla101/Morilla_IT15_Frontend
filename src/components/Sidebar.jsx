@@ -1,9 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-<<<<<<< HEAD
 import { Home, BookOpen, LogOut, X, Layers } from 'lucide-react';
-=======
-import { Home, Users, BookOpen, ClipboardList, FileText, Settings, LogOut, X } from 'lucide-react';
->>>>>>> b2e5797868fe35bc656ad79a139a2f0fbd1bb43e
 import '../styles/Sidebar.css';
 
 const Sidebar = ({ isOpen, closeSidebar }) => {
@@ -17,16 +13,8 @@ const Sidebar = ({ isOpen, closeSidebar }) => {
 
   const menuItems = [
     { path: '/dashboard', icon: Home, label: 'Dashboard' },
-<<<<<<< HEAD
     { path: '/programs', icon: Layers, label: 'Programs' },
     { path: '/subjects', icon: BookOpen, label: 'Subjects' },
-=======
-    { path: '/students', icon: Users, label: 'Students' },
-    { path: '/courses', icon: BookOpen, label: 'Courses' },
-    { path: '/enrollment', icon: ClipboardList, label: 'Enrollment' },
-    { path: '/reports', icon: FileText, label: 'Reports' },
-    { path: '/settings', icon: Settings, label: 'Settings' },
->>>>>>> b2e5797868fe35bc656ad79a139a2f0fbd1bb43e
   ];
 
   const handleNavClick = () => {

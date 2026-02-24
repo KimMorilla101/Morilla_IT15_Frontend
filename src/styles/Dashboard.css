@@ -110,24 +110,13 @@
 }
 
 .dashboard-bottom {
-<<<<<<< HEAD
-  display: block;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
 }
 
 .activity-section {
   min-height: 400px;
-  width: 100%;
-=======
-  display: grid;
-  grid-template-columns: 300px 1fr 400px;
-  gap: 20px;
-}
-
-.weather-section,
-.activity-section,
-.chatbot-section {
-  min-height: 400px;
->>>>>>> b2e5797868fe35bc656ad79a139a2f0fbd1bb43e
 }
 
 .activity-card {
@@ -185,6 +174,8 @@
 .activity-badge.student { background: #a00000; }
 .activity-badge.course { background: #c00000; }
 .activity-badge.report { background: #d00000; }
+.activity-badge.program { background: #800000; }
+.activity-badge.subject { background: #a00000; }
 
 .activity-details {
   flex: 1;
@@ -204,11 +195,7 @@
 
 @media (max-width: 1200px) {
   .dashboard-bottom {
-<<<<<<< HEAD
-    display: block;
-=======
     grid-template-columns: 1fr;
->>>>>>> b2e5797868fe35bc656ad79a139a2f0fbd1bb43e
   }
   
   .charts-grid {
