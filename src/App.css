@@ -1,0 +1,7 @@
+/* App.css - Global Application Styles */
+
+/* This file is intentionally minimal as most styles are component-specific */
+
+* {
+  box-sizing: border-box;
+}
