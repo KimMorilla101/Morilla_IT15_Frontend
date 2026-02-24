@@ -110,12 +110,24 @@
 }
 
 .dashboard-bottom {
+<<<<<<< HEAD
   display: block;
 }
 
 .activity-section {
   min-height: 400px;
   width: 100%;
+=======
+  display: grid;
+  grid-template-columns: 300px 1fr 400px;
+  gap: 20px;
+}
+
+.weather-section,
+.activity-section,
+.chatbot-section {
+  min-height: 400px;
+>>>>>>> b2e5797868fe35bc656ad79a139a2f0fbd1bb43e
 }
 
 .activity-card {
@@ -192,7 +204,11 @@
 
 @media (max-width: 1200px) {
   .dashboard-bottom {
+<<<<<<< HEAD
     display: block;
+=======
+    grid-template-columns: 1fr;
+>>>>>>> b2e5797868fe35bc656ad79a139a2f0fbd1bb43e
   }
   
   .charts-grid {

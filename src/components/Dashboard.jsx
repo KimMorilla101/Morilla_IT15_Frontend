@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+<<<<<<< HEAD
 import { Users, BookOpen, ClipboardList, Clock, ListChecks } from 'lucide-react';
 import {
   PieChart,
@@ -58,6 +59,21 @@ const Dashboard = () => {
     { title: 'Active Programs', value: activePrograms, icon: ClipboardList, color: '#c00000' },
     { title: 'Inactive Programs', value: inactivePrograms, icon: Clock, color: '#d00000' },
     { title: 'Subjects with Pre-reqs', value: subjectsWithPrereq, icon: ListChecks, color: '#800000' },
+=======
+import { Users, BookOpen, ClipboardList, Clock } from 'lucide-react';
+import { LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import Weather from '../components/Weather';
+import Chatbot from '../components/Chatbot';
+import { dashboardStats } from '../data/mockData';
+import '../styles/Dashboard.css';
+
+const Dashboard = () => {
+  const statCards = [
+    { title: 'Total Students', value: dashboardStats.totalStudents, icon: Users, color: '#800000' },
+    { title: 'Total Courses', value: dashboardStats.totalCourses, icon: BookOpen, color: '#a00000' },
+    { title: 'Active Enrollments', value: dashboardStats.activeEnrollments, icon: ClipboardList, color: '#c00000' },
+    { title: 'Pending Approvals', value: dashboardStats.pendingApprovals, icon: Clock, color: '#d00000' },
+>>>>>>> b2e5797868fe35bc656ad79a139a2f0fbd1bb43e
   ];
 
   return (
@@ -72,7 +88,10 @@ const Dashboard = () => {
         </div>
       </div>
 
+<<<<<<< HEAD
       <h2>Program & Subject Overview</h2>
+=======
+>>>>>>> b2e5797868fe35bc656ad79a139a2f0fbd1bb43e
       {/* Stats Cards */}
       <div className="stats-grid">
         {statCards.map((stat, index) => (
@@ -102,6 +121,7 @@ const Dashboard = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
         >
+<<<<<<< HEAD
           <h2>Subjects by Semester/Term</h2>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={subjectsByTerm}>
@@ -111,13 +131,36 @@ const Dashboard = () => {
               <Tooltip
                 contentStyle={{
                   background: 'rgba(255, 255, 255, 0.95)',
+=======
+          <h2>Enrollment Trends</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={dashboardStats.enrollmentTrends}>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(128, 0, 0, 0.1)" />
+              <XAxis dataKey="month" stroke="#666" />
+              <YAxis stroke="#666" />
+              <Tooltip 
+                contentStyle={{ 
+                  background: 'rgba(255, 255, 255, 0.95)', 
+>>>>>>> b2e5797868fe35bc656ad79a139a2f0fbd1bb43e
                   border: '1px solid rgba(128, 0, 0, 0.1)',
                   borderRadius: '10px'
                 }}
               />
               <Legend />
+<<<<<<< HEAD
               <Bar dataKey="count" name="Subjects" fill="#800000" radius={[8, 8, 0, 0]} />
             </BarChart>
+=======
+              <Line 
+                type="monotone" 
+                dataKey="enrollments" 
+                stroke="#800000" 
+                strokeWidth={3}
+                dot={{ fill: '#800000', r: 6 }}
+                activeDot={{ r: 8 }}
+              />
+            </LineChart>
+>>>>>>> b2e5797868fe35bc656ad79a139a2f0fbd1bb43e
           </ResponsiveContainer>
         </motion.div>
 
@@ -127,11 +170,19 @@ const Dashboard = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
         >
+<<<<<<< HEAD
           <h2>Active vs Inactive Programs</h2>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
                 data={programStatusData}
+=======
+          <h2>Program Distribution</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={dashboardStats.programDistribution}
+>>>>>>> b2e5797868fe35bc656ad79a139a2f0fbd1bb43e
                 cx="50%"
                 cy="50%"
                 labelLine={false}
@@ -140,6 +191,7 @@ const Dashboard = () => {
                 fill="#8884d8"
                 dataKey="value"
               >
+<<<<<<< HEAD
                 {programStatusData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
@@ -147,6 +199,15 @@ const Dashboard = () => {
               <Tooltip
                 contentStyle={{
                   background: 'rgba(255, 255, 255, 0.95)',
+=======
+                {dashboardStats.programDistribution.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip 
+                contentStyle={{ 
+                  background: 'rgba(255, 255, 255, 0.95)', 
+>>>>>>> b2e5797868fe35bc656ad79a139a2f0fbd1bb43e
                   border: '1px solid rgba(128, 0, 0, 0.1)',
                   borderRadius: '10px'
                 }}
@@ -156,15 +217,31 @@ const Dashboard = () => {
         </motion.div>
       </div>
 
+<<<<<<< HEAD
       {/* Bottom Section: Activity */}
       <div className="dashboard-bottom">
         <motion.div
+=======
+      {/* Bottom Section: Weather, Activity, Chatbot */}
+      <div className="dashboard-bottom">
+        <motion.div
+          className="weather-section"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+        >
+          <Weather />
+        </motion.div>
+
+        <motion.div
+>>>>>>> b2e5797868fe35bc656ad79a139a2f0fbd1bb43e
           className="activity-section"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7 }}
         >
           <div className="activity-card">
+<<<<<<< HEAD
             <h2>Recently Added</h2>
             <div className="activity-list">
               {recentAdditions.map((item) => (
@@ -183,12 +260,36 @@ const Dashboard = () => {
                         day: 'numeric'
                       })}
                     </span>
+=======
+            <h2>Recent Activities</h2>
+            <div className="activity-list">
+              {dashboardStats.recentActivities.map((activity) => (
+                <div key={activity.id} className="activity-item">
+                  <div className={`activity-badge ${activity.type}`}>
+                    {activity.type.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="activity-details">
+                    <p className="activity-message">{activity.message}</p>
+                    <span className="activity-time">{activity.time}</span>
+>>>>>>> b2e5797868fe35bc656ad79a139a2f0fbd1bb43e
                   </div>
                 </div>
               ))}
             </div>
           </div>
         </motion.div>
+<<<<<<< HEAD
+=======
+
+        <motion.div
+          className="chatbot-section"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8 }}
+        >
+          <Chatbot />
+        </motion.div>
+>>>>>>> b2e5797868fe35bc656ad79a139a2f0fbd1bb43e
       </div>
     </div>
   );

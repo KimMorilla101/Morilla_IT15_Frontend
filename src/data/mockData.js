@@ -57,6 +57,7 @@ export const dashboardStats = {
   ]
 };
 
+<<<<<<< HEAD
 export const programsData = [
   {
     id: 1,
@@ -410,6 +411,8 @@ export const subjectsData = [
   }
 ];
 
+=======
+>>>>>>> b2e5797868fe35bc656ad79a139a2f0fbd1bb43e
 // API Integration Structure (for future Laravel backend)
 export const apiEndpoints = {
   students: '/api/students',
