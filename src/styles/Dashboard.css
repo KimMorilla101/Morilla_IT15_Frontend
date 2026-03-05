@@ -29,12 +29,33 @@
 .current-date {
   background: var(--glass-white);
   backdrop-filter: blur(15px);
-  padding: 12px 20px;
+  padding: 16px 20px;
   border-radius: 12px;
   border: 1px solid rgba(128, 0, 0, 0.1);
   color: var(--primary-maroon);
   font-weight: 600;
   font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.date-text {
+  display: flex;
+  align-items: center;
+}
+
+.weather-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #666;
+  font-weight: 500;
+}
+
+.weather-info svg {
+  color: var(--primary-maroon);
 }
 
 .stats-grid {
@@ -253,6 +274,15 @@
   .current-date {
     width: 100%;
     text-align: center;
+    align-items: center;
+  }
+
+  .date-text {
+    justify-content: center;
+  }
+
+  .weather-info {
+    justify-content: center;
   }
 
   .chart-card {

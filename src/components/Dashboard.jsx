@@ -1,5 +1,6 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Layers, BookOpen, ClipboardList, Clock, ListChecks } from 'lucide-react';
+import { Layers, BookOpen, ClipboardList, Clock, ListChecks, Cloud, CloudRain, Sun } from 'lucide-react';
 import {
   PieChart,
   Pie,
@@ -17,6 +18,8 @@ import { programsData, subjectsData } from '../data/mockData';
 import '../styles/Dashboard.css';
 
 const Dashboard = () => {
+  const [weather, setWeather] = useState({ temp: 32, condition: 'Mostly cloudy' });
+
   const totalPrograms = programsData.length;
   const totalSubjects = subjectsData.length;
   const activePrograms = programsData.filter((program) => program.status === 'Active').length;
@@ -68,7 +71,13 @@ const Dashboard = () => {
           <p>Welcome back! Here's your enrollment system overview.</p>
         </div>
         <div className="current-date">
-          {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+          <div className="date-text">
+            {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+          </div>
+          <div className="weather-info">
+            <Cloud size={18} />
+            <span>{weather.temp}°C • {weather.condition}</span>
+          </div>
         </div>
       </div>
 

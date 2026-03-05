@@ -156,6 +156,30 @@
   text-decoration: underline;
 }
 
+.checkbox-container {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.checkbox-container input[type="checkbox"] {
+  width: auto;
+  cursor: pointer;
+  accent-color: var(--primary-maroon);
+}
+
+.checkbox-container label {
+  font-size: 13px;
+  color: #666;
+  cursor: pointer;
+  user-select: none;
+  margin: 0;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
 @media (max-width: 768px) {
   .login-box {
     padding: 40px 30px;
