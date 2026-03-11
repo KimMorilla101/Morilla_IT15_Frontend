@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
-import Topbar from './Topbar';
+import Navbar from './common/Navbar';
 import FloatingChat from './FloatingChat';
 import '../styles/Layout.css';
 
@@ -18,7 +18,7 @@ const Layout = () => {
 
   return (
     <div className="app-layout">
-      <Topbar toggleSidebar={toggleSidebar} />
+      <Navbar toggleSidebar={toggleSidebar} />
       <Sidebar isOpen={isSidebarOpen} closeSidebar={closeSidebar} />
       <main className="main-content">
         <Outlet />

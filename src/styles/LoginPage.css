@@ -119,6 +119,18 @@
   transform: translateY(-2px);
 }
 
+.input-group input.input-error {
+  border-color: #b53636;
+  box-shadow: 0 0 0 3px rgba(181, 54, 54, 0.12);
+}
+
+.field-error {
+  margin: 7px 0 0;
+  color: #8f1f1f;
+  font-size: 12px;
+  font-weight: 500;
+}
+
 .login-button {
   width: 100%;
   padding: 16px;
@@ -138,6 +150,24 @@
   background-color: #a00000;
   transform: translateY(-2px);
   box-shadow: 0 15px 25px rgba(128, 0, 0, 0.3);
+}
+
+.login-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.75;
+  transform: none;
+  box-shadow: none;
+}
+
+.login-button:disabled:hover {
+  background: var(--primary-maroon);
+}
+
+.form-error-message {
+  color: #800000;
+  margin-top: 12px;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 .footer-text {

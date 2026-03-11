@@ -1,9 +1,8 @@
 import { Menu } from 'lucide-react';
+import ProfilePanel from './ProfilePanel';
 import '../styles/Topbar.css';
 
 const Topbar = ({ toggleSidebar }) => {
-  const userId = localStorage.getItem('userId');
-
   return (
     <div className="topbar">
       <button className="hamburger-btn" onClick={toggleSidebar}>
@@ -14,9 +13,7 @@ const Topbar = ({ toggleSidebar }) => {
         <h1 className="topbar-title">Enrollment System</h1>
         
         <div className="topbar-right">
-          <div className="user-info">
-            <span className="user-id">{userId || 'Guest'}</span>
-          </div>
+          <ProfilePanel />
         </div>
       </div>
     </div>

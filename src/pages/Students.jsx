@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Filter, UserPlus, Mail, Phone } from 'lucide-react';
+import { Search, Filter, UserPlus, Mail } from 'lucide-react';
 import Modal from '../components/Modal';
 import { studentsData } from '../data/mockData';
 import '../styles/Pages.css';
@@ -12,11 +12,12 @@ const Students = () => {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [showViewModal, setShowViewModal] = useState(false);
 
-  const programs = ['All', ...new Set(students.map(s => s.program))];
+  const programs = ['All', ...new Set(students.map((student) => student.program))];
 
-  const filteredStudents = students.filter(student => {
-    const matchesSearch = student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         student.studentId.includes(searchTerm);
+  const filteredStudents = students.filter((student) => {
+    const matchesSearch =
+      student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.studentId.includes(searchTerm);
     const matchesProgram = filterProgram === 'All' || student.program === filterProgram;
     return matchesSearch && matchesProgram;
   });
@@ -33,9 +34,11 @@ const Students = () => {
           <h1>Students</h1>
           <p>Manage student records and information</p>
         </div>
-        <button 
+        <button
           className="primary-btn"
-          onClick={() => alert('Add New Student form will open. This will connect to Laravel API POST /api/students')}
+          onClick={() =>
+            alert('Add New Student form will open. This will connect to Laravel API POST /api/students')
+          }
         >
           <UserPlus size={18} />
           Add Student
@@ -49,15 +52,17 @@ const Students = () => {
             type="text"
             placeholder="Search by name or student ID..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(event) => setSearchTerm(event.target.value)}
           />
         </div>
 
         <div className="filter-group">
           <Filter size={18} />
-          <select value={filterProgram} onChange={(e) => setFilterProgram(e.target.value)}>
-            {programs.map(prog => (
-              <option key={prog} value={prog}>{prog}</option>
+          <select value={filterProgram} onChange={(event) => setFilterProgram(event.target.value)}>
+            {programs.map((program) => (
+              <option key={program} value={program}>
+                {program}
+              </option>
             ))}
           </select>
         </div>
@@ -97,21 +102,20 @@ const Students = () => {
                 <td>{student.year}</td>
                 <td>{student.enrolledUnits}</td>
                 <td>
-                  <span className={`status-badge ${student.status.toLowerCase()}`}>
-                    {student.status}
-                  </span>
+                  <span className={`status-badge ${student.status.toLowerCase()}`}>{student.status}</span>
                 </td>
                 <td>
                   <div className="action-buttons">
-                    <button 
-                      className="btn-sm btn-view"
-                      onClick={() => handleViewStudent(student)}
-                    >
+                    <button className="btn-sm btn-view" onClick={() => handleViewStudent(student)}>
                       View
                     </button>
-                    <button 
+                    <button
                       className="btn-sm btn-edit"
-                      onClick={() => alert(`Edit functionality for ${student.name} will be connected to Laravel API PUT /api/students/${student.id}`)}
+                      onClick={() =>
+                        alert(
+                          `Edit functionality for ${student.name} will be connected to Laravel API PUT /api/students/${student.id}`,
+                        )
+                      }
                     >
                       Edit
                     </button>
@@ -180,15 +184,16 @@ const Students = () => {
             </div>
 
             <div className="modal-actions">
-              <button
-                className="modal-btn modal-btn-secondary"
-                onClick={() => setShowViewModal(false)}
-              >
+              <button className="modal-btn modal-btn-secondary" onClick={() => setShowViewModal(false)}>
                 Close
               </button>
               <button
                 className="modal-btn modal-btn-primary"
-                onClick={() => alert(`Edit ${selectedStudent.name} - Laravel API: PUT /api/students/${selectedStudent.id}`)}
+                onClick={() =>
+                  alert(
+                    `Edit ${selectedStudent.name} - Laravel API: PUT /api/students/${selectedStudent.id}`,
+                  )
+                }
               >
                 Edit Student
               </button>

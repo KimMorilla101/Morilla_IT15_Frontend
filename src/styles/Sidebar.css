@@ -38,6 +38,56 @@
   border-bottom: 1px solid rgba(128, 0, 0, 0.1);
 }
 
+.sidebar-profile-card {
+  margin-top: 18px;
+  padding: 12px;
+  border: 1px solid rgba(128, 0, 0, 0.12);
+  border-radius: 12px;
+  background: rgba(128, 0, 0, 0.04);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sidebar-profile-card-footer {
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+
+.sidebar-profile-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.sidebar-profile-text {
+  min-width: 0;
+}
+
+.sidebar-profile-title {
+  margin: 0;
+  color: var(--primary-maroon);
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+.sidebar-profile-subtitle {
+  margin: 2px 0 0;
+  color: #666;
+  font-size: 12px;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .logo {
   display: flex;
   align-items: center;

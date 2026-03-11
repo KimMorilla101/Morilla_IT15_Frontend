@@ -1,223 +1,191 @@
-import { useMemo, useState } from 'react';
-import { BookPlus } from 'lucide-react';
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Search, Filter, BookPlus } from 'lucide-react';
 import Modal from './Modal';
-import FilterBar from './FilterBar';
-import ProgramCard from './ProgramCard';
-import ProgramDetails from './ProgramDetails';
-import { programsData, subjectsData } from '../data/mockData';
+import { programsData } from '../data/mockData';
 import '../styles/Pages.css';
 
 const ProgramList = () => {
+  const [programs] = useState(programsData);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('All');
-  const [typeFilter, setTypeFilter] = useState('All');
+  const [filterDepartment, setFilterDepartment] = useState('All');
   const [selectedProgram, setSelectedProgram] = useState(null);
-  const [showDetailsModal, setShowDetailsModal] = useState(false);
-  const [showFormModal, setShowFormModal] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
 
-  const [formValues, setFormValues] = useState({
-    code: '',
-    name: '',
-    type: "Bachelor's",
-    duration: '4 years',
-    totalUnits: '',
-    status: 'Active',
-    description: ''
-  });
+  const departments = ['All', ...new Set(programs.map((program) => program.department))];
 
-  const programTypes = useMemo(() => {
-    const types = new Set(programsData.map((program) => program.type));
-    return ['All', ...Array.from(types)];
-  }, []);
-
-  const statusOptions = ['All Statuses', 'Active', 'Under Review', 'Phased Out'];
-
-  const subjectsByCode = useMemo(() => {
-    return subjectsData.reduce((lookup, subject) => {
-      lookup[subject.code] = subject;
-      return lookup;
-    }, {});
-  }, []);
-
-  const filteredPrograms = programsData.filter((program) => {
+  const filteredPrograms = programs.filter((program) => {
     const matchesSearch =
-      program.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      program.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'All' || program.status === statusFilter;
-    const matchesType = typeFilter === 'All' || program.type === typeFilter;
-
-    return matchesSearch && matchesStatus && matchesType;
+      program.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      program.code.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesDepartment = filterDepartment === 'All' || program.department === filterDepartment;
+    return matchesSearch && matchesDepartment;
   });
-
-  const filters = [
-    {
-      id: 'status',
-      label: 'Filter by status',
-      title: 'Status',
-      value: statusFilter,
-      onChange: setStatusFilter,
-      options: statusOptions.map((status) => ({ label: status, value: status }))
-    },
-    {
-      id: 'type',
-      label: 'Filter by type',
-      title: 'Program Type',
-      value: typeFilter,
-      onChange: setTypeFilter,
-      options: programTypes.map((type) => ({ label: type, value: type }))
-    }
-  ];
 
   const handleViewProgram = (program) => {
     setSelectedProgram(program);
-    setShowDetailsModal(true);
-  };
-
-  const handleFormChange = (field, value) => {
-    setFormValues((prev) => ({ ...prev, [field]: value }));
+    setShowViewModal(true);
   };
 
   return (
     <div className="page-container">
       <div className="page-header">
         <div>
-          <h1>Program Offerings</h1>
-          <p>Review program availability, status, and curriculum structure</p>
+          <h1>Programs</h1>
+          <p>Manage academic programs and curriculum structure</p>
         </div>
-        <button className="primary-btn" onClick={() => setShowFormModal(true)}>
+        <button className="primary-btn" onClick={() => alert('Add Program functionality will be connected to Laravel API')}>
           <BookPlus size={18} />
           Add Program
         </button>
       </div>
 
-      <h2>Program Listing</h2>
+      <div className="page-controls">
+        <div className="search-box">
+          <Search size={18} />
+          <input
+            type="text"
+            placeholder="Search by program name or code..."
+            value={searchTerm}
+            onChange={(event) => setSearchTerm(event.target.value)}
+          />
+        </div>
 
-      <FilterBar
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        searchTitle="Search"
-        searchPlaceholder="Search by program code or name..."
-        filters={filters}
-      />
+        <div className="filter-group">
+          <Filter size={18} />
+          <select value={filterDepartment} onChange={(event) => setFilterDepartment(event.target.value)}>
+            {departments.map((department) => (
+              <option key={department} value={department}>
+                {department}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
 
-      <div className="courses-grid">
-        {filteredPrograms.map((program) => (
-          <ProgramCard key={program.id} program={program} onView={handleViewProgram} />
-        ))}
+      <div className="table-container">
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Program Name</th>
+              <th>Department</th>
+              <th>Duration</th>
+              <th>Total Units</th>
+              <th>Students</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredPrograms.map((program, index) => (
+              <motion.tr
+                key={program.id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.05 }}
+              >
+                <td className="font-weight-bold">{program.code}</td>
+                <td>{program.name}</td>
+                <td>{program.department}</td>
+                <td>{program.duration}</td>
+                <td>{program.totalUnits}</td>
+                <td>{program.studentCount}</td>
+                <td>
+                  <span className={`status-badge ${program.status.toLowerCase()}`}>{program.status}</span>
+                </td>
+                <td>
+                  <div className="action-buttons">
+                    <button className="btn-sm btn-view" onClick={() => handleViewProgram(program)}>
+                      View
+                    </button>
+                    <button
+                      className="btn-sm btn-edit"
+                      onClick={() =>
+                        alert(
+                          `Edit functionality for ${program.name} will be connected to Laravel API PUT /api/programs/${program.id}`,
+                        )
+                      }
+                    >
+                      Edit
+                    </button>
+                  </div>
+                </td>
+              </motion.tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="pagination">
+        <span className="pagination-info">
+          Showing {filteredPrograms.length} of {programs.length} programs
+        </span>
       </div>
 
       <Modal
-        isOpen={showDetailsModal}
-        onClose={() => setShowDetailsModal(false)}
+        isOpen={showViewModal}
+        onClose={() => setShowViewModal(false)}
         title="Program Details"
-        size="large"
-      >
-        <ProgramDetails program={selectedProgram} subjectsByCode={subjectsByCode} />
-        <div className="modal-actions">
-          <button
-            className="modal-btn modal-btn-secondary"
-            onClick={() => setShowDetailsModal(false)}
-          >
-            Close
-          </button>
-          <button
-            className="modal-btn modal-btn-primary"
-            onClick={() => alert('Edit program form (design only).')}
-          >
-            Edit Program
-          </button>
-        </div>
-      </Modal>
-
-      <Modal
-        isOpen={showFormModal}
-        onClose={() => setShowFormModal(false)}
-        title="Add Program"
         size="medium"
       >
-        <div className="modal-form-group">
-          <label>Program Code</label>
-          <input
-            type="text"
-            placeholder="e.g., BSIT"
-            value={formValues.code}
-            onChange={(event) => handleFormChange('code', event.target.value)}
-          />
-        </div>
-        <div className="modal-form-group">
-          <label>Program Name</label>
-          <input
-            type="text"
-            placeholder="Program name"
-            value={formValues.name}
-            onChange={(event) => handleFormChange('name', event.target.value)}
-          />
-        </div>
-        <div className="modal-form-group">
-          <label>Program Type</label>
-          <select
-            value={formValues.type}
-            onChange={(event) => handleFormChange('type', event.target.value)}
-          >
-            <option value="Bachelor's">Bachelor's</option>
-            <option value="Diploma">Diploma</option>
-            <option value="Certificate">Certificate</option>
-          </select>
-        </div>
-        <div className="modal-form-group">
-          <label>Duration</label>
-          <input
-            type="text"
-            placeholder="e.g., 4 years"
-            value={formValues.duration}
-            onChange={(event) => handleFormChange('duration', event.target.value)}
-          />
-        </div>
-        <div className="modal-form-group">
-          <label>Total Units</label>
-          <input
-            type="number"
-            placeholder="Total units"
-            value={formValues.totalUnits}
-            onChange={(event) => handleFormChange('totalUnits', event.target.value)}
-          />
-        </div>
-        <div className="modal-form-group">
-          <label>Status</label>
-          <select
-            value={formValues.status}
-            onChange={(event) => handleFormChange('status', event.target.value)}
-          >
-            <option value="Active">Active</option>
-            <option value="Under Review">Under Review</option>
-            <option value="Phased Out">Phased Out</option>
-          </select>
-        </div>
-        <div className="modal-form-group">
-          <label>Description</label>
-          <textarea
-            placeholder="Brief program description"
-            value={formValues.description}
-            onChange={(event) => handleFormChange('description', event.target.value)}
-          />
-        </div>
-        <div className="modal-actions">
-          <button
-            className="modal-btn modal-btn-secondary"
-            onClick={() => setShowFormModal(false)}
-          >
-            Cancel
-          </button>
-          <button
-            className="modal-btn modal-btn-primary"
-            onClick={() => {
-              alert('Program form submission is design only.');
-              setShowFormModal(false);
-            }}
-          >
-            Save Program
-          </button>
-        </div>
+        {selectedProgram && (
+          <>
+            <div className="modal-info-grid">
+              <div className="modal-info-item">
+                <span className="modal-info-label">Program Code</span>
+                <span className="modal-info-value">{selectedProgram.code}</span>
+              </div>
+              <div className="modal-info-item">
+                <span className="modal-info-label">Program Name</span>
+                <span className="modal-info-value">{selectedProgram.name}</span>
+              </div>
+            </div>
+
+            <div className="modal-info-grid">
+              <div className="modal-info-item">
+                <span className="modal-info-label">Department</span>
+                <span className="modal-info-value">{selectedProgram.department}</span>
+              </div>
+              <div className="modal-info-item">
+                <span className="modal-info-label">Duration</span>
+                <span className="modal-info-value">{selectedProgram.duration}</span>
+              </div>
+            </div>
+
+            <div className="modal-info-grid">
+              <div className="modal-info-item">
+                <span className="modal-info-label">Total Units</span>
+                <span className="modal-info-value">{selectedProgram.totalUnits} units</span>
+              </div>
+              <div className="modal-info-item">
+                <span className="modal-info-label">Enrolled Students</span>
+                <span className="modal-info-value">{selectedProgram.studentCount}</span>
+              </div>
+            </div>
+
+            <div className="modal-form-group">
+              <label>Description</label>
+              <textarea readOnly value={selectedProgram.description} />
+            </div>
+
+            <div className="modal-actions">
+              <button className="modal-btn modal-btn-secondary" onClick={() => setShowViewModal(false)}>
+                Close
+              </button>
+              <button
+                className="modal-btn modal-btn-primary"
+                onClick={() =>
+                  alert(
+                    `Edit ${selectedProgram.name} - Laravel API: PUT /api/programs/${selectedProgram.id}`,
+                  )
+                }
+              >
+                Edit Program
+              </button>
+            </div>
+          </>
+        )}
       </Modal>
     </div>
   );

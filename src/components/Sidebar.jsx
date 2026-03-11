@@ -1,20 +1,98 @@
+import { useEffect, useMemo, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Home, BookOpen, LogOut, X, Layers } from 'lucide-react';
+import {
+  Home,
+  BookOpen,
+  LogOut,
+  X,
+  Layers,
+  Users,
+  ClipboardList,
+  CalendarDays,
+  BarChart3,
+  Settings,
+} from 'lucide-react';
+import { fetchProfile, getStoredProfile, logout } from '../services/authApi';
 import '../styles/Sidebar.css';
+
+const FALLBACK_PROFILE = {
+  sidebar_card: {
+    title: 'User',
+    subtitle: 'No email',
+  },
+  avatar: {
+    initials: 'U',
+    background_color: '#800000',
+    text_color: '#FFFFFF',
+  },
+};
 
 const Sidebar = ({ isOpen, closeSidebar }) => {
   const navigate = useNavigate();
+  const [profile, setProfile] = useState(() => getStoredProfile() || FALLBACK_PROFILE);
 
-  const handleLogout = () => {
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('userId');
-    navigate('/');
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadProfile = async () => {
+      try {
+        const payload = await fetchProfile();
+        const nextProfile = payload?.profile || getStoredProfile() || FALLBACK_PROFILE;
+
+        if (isMounted) {
+          setProfile(nextProfile);
+        }
+      } catch {
+        const cachedProfile = getStoredProfile();
+        if (isMounted && cachedProfile) {
+          setProfile(cachedProfile);
+        }
+      }
+    };
+
+    loadProfile();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/', { replace: true });
   };
+
+  const sidebarTitle =
+    profile?.sidebar_card?.title || profile?.name || FALLBACK_PROFILE.sidebar_card.title;
+  const sidebarSubtitle =
+    profile?.sidebar_card?.subtitle || profile?.email || FALLBACK_PROFILE.sidebar_card.subtitle;
+  const avatarInitials =
+    profile?.avatar?.initials ||
+    sidebarTitle
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((item) => item[0].toUpperCase())
+      .join('') ||
+    FALLBACK_PROFILE.avatar.initials;
+
+  const avatarStyle = useMemo(
+    () => ({
+      background: profile?.avatar?.background_color || FALLBACK_PROFILE.avatar.background_color,
+      color: profile?.avatar?.text_color || FALLBACK_PROFILE.avatar.text_color,
+    }),
+    [profile],
+  );
 
   const menuItems = [
     { path: '/dashboard', icon: Home, label: 'Dashboard' },
+    { path: '/students', icon: Users, label: 'Students' },
     { path: '/programs', icon: Layers, label: 'Programs' },
     { path: '/subjects', icon: BookOpen, label: 'Subjects' },
+    { path: '/enrollment', icon: ClipboardList, label: 'Enrollment' },
+    { path: '/academic-calendar', icon: CalendarDays, label: 'Academic Calendar' },
+    { path: '/reports', icon: BarChart3, label: 'Reports' },
+    { path: '/settings', icon: Settings, label: 'Settings' },
   ];
 
   const handleNavClick = () => {
@@ -57,6 +135,16 @@ const Sidebar = ({ isOpen, closeSidebar }) => {
       </nav>
 
       <div className="sidebar-footer">
+        <div className="sidebar-profile-card sidebar-profile-card-footer">
+          <div className="sidebar-profile-avatar" style={avatarStyle}>
+            {avatarInitials}
+          </div>
+          <div className="sidebar-profile-text">
+            <p className="sidebar-profile-title">{sidebarTitle}</p>
+            <p className="sidebar-profile-subtitle">{sidebarSubtitle}</p>
+          </div>
+        </div>
+
         <button onClick={handleLogout} className="logout-btn">
           <LogOut size={20} />
           <span>Logout</span>

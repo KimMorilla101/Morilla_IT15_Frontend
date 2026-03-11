@@ -1,0 +1,113 @@
+.loading-spinner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.loading-spinner.compact {
+  font-size: 12px;
+  gap: 8px;
+}
+
+.loading-spinner-circle {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid rgba(128, 0, 0, 0.15);
+  border-top-color: var(--primary-maroon);
+  animation: spinner-rotate 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+.loading-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.skeleton-line {
+  height: 12px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, rgba(128, 0, 0, 0.08), rgba(128, 0, 0, 0.17), rgba(128, 0, 0, 0.08));
+  background-size: 200% 100%;
+  animation: shimmer 1.2s ease-in-out infinite;
+}
+
+.skeleton-line:nth-child(2n) {
+  width: 85%;
+}
+
+.skeleton-line:nth-child(3n) {
+  width: 70%;
+}
+
+.chart-skeleton {
+  height: 280px;
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  padding: 16px 0 8px;
+}
+
+.chart-skeleton-bar {
+  flex: 1;
+  border-radius: 8px 8px 4px 4px;
+  background: linear-gradient(180deg, rgba(128, 0, 0, 0.25), rgba(128, 0, 0, 0.08));
+}
+
+.app-error-boundary {
+  min-height: 100vh;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  background: radial-gradient(circle at top right, #ffffff, #fcf4f4);
+}
+
+.app-error-boundary h1 {
+  font-size: 30px;
+  color: var(--text-dark);
+}
+
+.app-error-boundary p {
+  max-width: 540px;
+  color: #666;
+  line-height: 1.6;
+}
+
+.error-boundary-retry {
+  margin-top: 8px;
+  border: none;
+  border-radius: 10px;
+  background: var(--primary-maroon);
+  color: #fff;
+  padding: 12px 18px;
+  cursor: pointer;
+}
+
+@keyframes spinner-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  100% {
+    background-position: 200% 50%;
+  }
+}

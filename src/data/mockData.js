@@ -1,414 +1,697 @@
 // Mock Data Structure - Ready for Laravel REST API Integration
-// API Endpoints will follow this structure: /api/students, /api/courses, etc.
+// Provides rich local data when backend mode is disabled.
 
-export const studentsData = [
-  { id: 1, studentId: '2024-0001', name: 'Juan Dela Cruz', email: 'juan.delacruz@email.com', program: 'BS Computer Science', year: 3, status: 'Active', enrolledUnits: 21 },
-  { id: 2, studentId: '2024-0002', name: 'Maria Santos', email: 'maria.santos@email.com', program: 'BS Information Technology', year: 2, status: 'Active', enrolledUnits: 18 },
-  { id: 3, studentId: '2024-0003', name: 'Pedro Rodriguez', email: 'pedro.rodriguez@email.com', program: 'BS Computer Engineering', year: 4, status: 'Active', enrolledUnits: 15 },
-  { id: 4, studentId: '2024-0004', name: 'Ana Reyes', email: 'ana.reyes@email.com', program: 'BS Computer Science', year: 1, status: 'Active', enrolledUnits: 24 },
-  { id: 5, studentId: '2024-0005', name: 'Carlos Mendoza', email: 'carlos.mendoza@email.com', program: 'BS Information Technology', year: 3, status: 'Inactive', enrolledUnits: 0 },
-];
+const formatDateIso = (value) => value.toISOString().slice(0, 10);
 
-export const coursesData = [
-  { id: 1, courseCode: 'CS101', title: 'Introduction to Programming', units: 3, instructor: 'Prof. Garcia', schedule: 'MWF 8:00-9:00 AM', capacity: 40, enrolled: 35, available: 5 },
-  { id: 2, courseCode: 'CS201', title: 'Data Structures & Algorithms', units: 3, instructor: 'Prof. Torres', schedule: 'TTH 10:00-11:30 AM', capacity: 35, enrolled: 30, available: 5 },
-  { id: 3, courseCode: 'IT301', title: 'Web Development', units: 3, instructor: 'Prof. Ramos', schedule: 'MWF 1:00-2:00 PM', capacity: 30, enrolled: 28, available: 2 },
-  { id: 4, courseCode: 'CS305', title: 'Database Systems', units: 3, instructor: 'Prof. Villanueva', schedule: 'TTH 2:00-3:30 PM', capacity: 35, enrolled: 32, available: 3 },
-  { id: 5, courseCode: 'IT401', title: 'Systems Integration', units: 3, instructor: 'Prof. Cruz', schedule: 'MWF 3:00-4:00 PM', capacity: 25, enrolled: 25, available: 0 },
-  { id: 6, courseCode: 'CS402', title: 'Machine Learning', units: 3, instructor: 'Prof. Bautista', schedule: 'TTH 4:00-5:30 PM', capacity: 30, enrolled: 22, available: 8 },
-];
-
-export const enrollmentData = [
-  { id: 1, studentId: '2024-0001', studentName: 'Juan Dela Cruz', courseCode: 'CS201', courseName: 'Data Structures & Algorithms', units: 3, semester: '2nd Semester 2025-2026', status: 'Enrolled', date: '2026-01-15' },
-  { id: 2, studentId: '2024-0001', studentName: 'Juan Dela Cruz', courseCode: 'CS305', courseName: 'Database Systems', units: 3, semester: '2nd Semester 2025-2026', status: 'Enrolled', date: '2026-01-15' },
-  { id: 3, studentId: '2024-0002', studentName: 'Maria Santos', courseCode: 'IT301', courseName: 'Web Development', units: 3, semester: '2nd Semester 2025-2026', status: 'Enrolled', date: '2026-01-16' },
-  { id: 4, studentId: '2024-0003', studentName: 'Pedro Rodriguez', courseCode: 'CS402', courseName: 'Machine Learning', units: 3, semester: '2nd Semester 2025-2026', status: 'Enrolled', date: '2026-01-14' },
-  { id: 5, studentId: '2024-0004', studentName: 'Ana Reyes', courseCode: 'CS101', courseName: 'Introduction to Programming', units: 3, semester: '2nd Semester 2025-2026', status: 'Pending', date: '2026-02-18' },
-];
-
-export const dashboardStats = {
-  totalStudents: 1247,
-  totalCourses: 86,
-  activeEnrollments: 3891,
-  pendingApprovals: 23,
-  
-  // Chart data
-  enrollmentTrends: [
-    { month: 'Aug', enrollments: 420 },
-    { month: 'Sep', enrollments: 380 },
-    { month: 'Oct', enrollments: 250 },
-    { month: 'Nov', enrollments: 180 },
-    { month: 'Dec', enrollments: 120 },
-    { month: 'Jan', enrollments: 890 },
-    { month: 'Feb', enrollments: 740 },
-  ],
-  
-  programDistribution: [
-    { name: 'Computer Science', value: 485, color: '#800000' },
-    { name: 'Information Technology', value: 412, color: '#a00000' },
-    { name: 'Computer Engineering', value: 350, color: '#c00000' },
-  ],
-  
-  recentActivities: [
-    { id: 1, type: 'enrollment', message: 'New enrollment: Ana Reyes', time: '2 hours ago' },
-    { id: 2, type: 'student', message: 'Student profile updated: Juan Dela Cruz', time: '5 hours ago' },
-    { id: 3, type: 'course', message: 'Course added: Advanced AI', time: '1 day ago' },
-    { id: 4, type: 'report', message: 'Monthly report generated', time: '2 days ago' },
-  ]
-};
-
-export const programsData = [
+const PROGRAM_CATALOG = [
   {
-    id: 1,
+    code: 'BSCS',
+    name: 'BS Computer Science',
+    department: 'School of Computing',
+    duration: '4 years',
+    totalUnits: 152,
+    status: 'Active',
+    description:
+      'Focuses on software engineering, algorithms, and data-driven systems for modern applications.',
+  },
+  {
     code: 'BSIT',
-    name: 'Bachelor of Science in Information Technology',
-    type: "Bachelor's",
+    name: 'BS Information Technology',
+    department: 'School of Computing',
     duration: '4 years',
     totalUnits: 146,
     status: 'Active',
-    description: 'Focuses on software development, systems administration, and applied computing for business solutions.',
-    yearLevels: [
-      { year: '1st Year', subjects: ['IT101', 'IT102', 'GE101', 'MATH101'] },
-      { year: '2nd Year', subjects: ['IT201', 'IT202', 'IT203', 'STAT201'] },
-      { year: '3rd Year', subjects: ['IT301', 'IT302', 'IT303', 'IT304'] },
-      { year: '4th Year', subjects: ['IT401', 'IT402', 'IT403', 'IT404'] }
-    ],
-    addedDate: '2026-02-20'
+    description:
+      'Covers systems administration, networking, and enterprise application development.',
   },
   {
-    id: 2,
-    code: 'BSCS',
-    name: 'Bachelor of Science in Computer Science',
-    type: "Bachelor's",
+    code: 'BSIS',
+    name: 'BS Information Systems',
+    department: 'School of Business and Technology',
     duration: '4 years',
-    totalUnits: 150,
+    totalUnits: 144,
     status: 'Active',
-    description: 'Emphasizes algorithms, software engineering, data science, and theoretical foundations of computing.',
-    yearLevels: [
-      { year: '1st Year', subjects: ['CS101', 'CS102', 'GE101', 'MATH101'] },
-      { year: '2nd Year', subjects: ['CS201', 'CS202', 'CS203', 'STAT201'] },
-      { year: '3rd Year', subjects: ['CS301', 'CS302', 'CS303', 'CS304'] },
-      { year: '4th Year', subjects: ['CS401', 'CS402', 'CS403', 'CS404'] }
-    ],
-    addedDate: '2026-02-16'
+    description:
+      'Bridges business analysis and information systems design for organizational solutions.',
   },
   {
-    id: 3,
-    code: 'BSCE',
-    name: 'Bachelor of Science in Computer Engineering',
-    type: "Bachelor's",
+    code: 'BSCPE',
+    name: 'BS Computer Engineering',
+    department: 'College of Engineering',
     duration: '5 years',
-    totalUnits: 178,
-    status: 'Under Review',
-    description: 'Integrates hardware design, embedded systems, and computer architecture with software fundamentals.',
-    yearLevels: [
-      { year: '1st Year', subjects: ['CE101', 'CE102', 'GE101', 'MATH101'] },
-      { year: '2nd Year', subjects: ['CE201', 'CE202', 'CE203', 'STAT201'] },
-      { year: '3rd Year', subjects: ['CE301', 'CE302', 'CE303', 'CE304'] },
-      { year: '4th Year', subjects: ['CE401', 'CE402', 'CE403', 'CE404'] },
-      { year: '5th Year', subjects: ['CE501', 'CE502', 'CE503'] }
-    ],
-    addedDate: '2026-02-10'
+    totalUnits: 175,
+    status: 'Active',
+    description:
+      'Combines electronics, embedded systems, and computer architecture with software fundamentals.',
   },
-  {
-    id: 4,
-    code: 'DIT',
-    name: 'Diploma in Information Technology',
-    type: 'Diploma',
-    duration: '2 years',
-    totalUnits: 82,
-    status: 'Phased Out',
-    description: 'Provides foundational IT skills for system support, networking, and basic programming.',
-    yearLevels: [
-      { year: '1st Year', subjects: ['DIT101', 'DIT102', 'GE101', 'MATH101'] },
-      { year: '2nd Year', subjects: ['DIT201', 'DIT202', 'DIT203', 'DIT204'] }
-    ],
-    addedDate: '2025-12-12'
-  }
 ];
 
-export const subjectsData = [
-  {
-    id: 1,
-    code: 'IT101',
-    title: 'Foundations of Computing',
-    units: 3,
-    termType: 'Semester',
-    semester: '1st Semester',
-    programCode: 'BSIT',
-    programName: 'BS Information Technology',
-    description: 'Introduces computing concepts, problem solving, and productivity tools.',
-    preReqs: [],
-    coReqs: [],
-    addedDate: '2026-02-18'
-  },
-  {
-    id: 2,
-    code: 'IT102',
-    title: 'Programming Fundamentals',
-    units: 4,
-    termType: 'Semester',
-    semester: '1st Semester',
-    programCode: 'BSIT',
-    programName: 'BS Information Technology',
-    description: 'Covers basic programming constructs using a modern language.',
-    preReqs: [],
-    coReqs: [],
-    addedDate: '2026-02-18'
-  },
-  {
-    id: 3,
-    code: 'IT201',
-    title: 'Web Development I',
-    units: 3,
-    termType: 'Both',
-    semester: '2nd Semester',
-    programCode: 'BSIT',
-    programName: 'BS Information Technology',
-    description: 'Front-end development with responsive layouts and accessibility.',
-    preReqs: ['IT102'],
-    coReqs: [],
-    addedDate: '2026-02-12'
-  },
-  {
-    id: 4,
-    code: 'IT301',
-    title: 'Systems Integration',
-    units: 2,
-    termType: 'Term',
-    semester: 'Midyear Term',
-    programCode: 'BSIT',
-    programName: 'BS Information Technology',
-    description: 'Integrates system components and services into cohesive solutions.',
-    preReqs: ['IT201'],
-    coReqs: [],
-    addedDate: '2026-01-28'
-  },
-  {
-    id: 5,
-    code: 'CS101',
-    title: 'Introduction to Computing',
-    units: 3,
-    termType: 'Semester',
-    semester: '1st Semester',
-    programCode: 'BSCS',
-    programName: 'BS Computer Science',
-    description: 'Overview of computer science disciplines and computational thinking.',
-    preReqs: [],
-    coReqs: [],
-    addedDate: '2026-02-15'
-  },
-  {
-    id: 6,
-    code: 'CS201',
-    title: 'Data Structures and Algorithms',
-    units: 4,
-    termType: 'Semester',
-    semester: '2nd Semester',
-    programCode: 'BSCS',
-    programName: 'BS Computer Science',
-    description: 'Covers fundamental data structures and algorithmic analysis.',
-    preReqs: ['CS101'],
-    coReqs: [],
-    addedDate: '2026-02-05'
-  },
-  {
-    id: 7,
-    code: 'CS301',
-    title: 'Software Engineering',
-    units: 3,
-    termType: 'Both',
-    semester: '1st Semester',
-    programCode: 'BSCS',
-    programName: 'BS Computer Science',
-    description: 'Software development life cycle, modeling, and quality assurance.',
-    preReqs: ['CS201'],
-    coReqs: [],
-    addedDate: '2026-01-20'
-  },
-  {
-    id: 8,
-    code: 'CS401',
-    title: 'Machine Learning',
-    units: 4,
-    termType: 'Term',
-    semester: 'Midyear Term',
-    programCode: 'BSCS',
-    programName: 'BS Computer Science',
-    description: 'Supervised and unsupervised learning techniques with applications.',
-    preReqs: ['CS201', 'STAT201'],
-    coReqs: [],
-    addedDate: '2026-01-10'
-  },
-  {
-    id: 9,
-    code: 'CE101',
-    title: 'Digital Logic Design',
-    units: 3,
-    termType: 'Semester',
-    semester: '1st Semester',
-    programCode: 'BSCE',
-    programName: 'BS Computer Engineering',
-    description: 'Binary systems, logic gates, and combinational circuits.',
-    preReqs: [],
-    coReqs: [],
-    addedDate: '2026-01-05'
-  },
-  {
-    id: 10,
-    code: 'CE201',
-    title: 'Microprocessors',
-    units: 4,
-    termType: 'Semester',
-    semester: '2nd Semester',
-    programCode: 'BSCE',
-    programName: 'BS Computer Engineering',
-    description: 'Architecture and programming of microprocessors and peripherals.',
-    preReqs: ['CE101'],
-    coReqs: [],
-    addedDate: '2025-12-22'
-  },
-  {
-    id: 11,
-    code: 'DIT101',
-    title: 'IT Essentials',
-    units: 2,
-    termType: 'Semester',
-    semester: '1st Semester',
-    programCode: 'DIT',
-    programName: 'Diploma in Information Technology',
-    description: 'Covers hardware, operating systems, and basic troubleshooting.',
-    preReqs: [],
-    coReqs: [],
-    addedDate: '2025-12-10'
-  },
-  {
-    id: 12,
-    code: 'DIT201',
-    title: 'Network Fundamentals',
-    units: 3,
-    termType: 'Both',
-    semester: '2nd Semester',
-    programCode: 'DIT',
-    programName: 'Diploma in Information Technology',
-    description: 'Introduces networking concepts, cabling, and basic configuration.',
-    preReqs: ['DIT101'],
-    coReqs: [],
-    addedDate: '2025-12-02'
-  },
-  {
-    id: 13,
-    code: 'IT205',
-    title: 'Database Fundamentals',
-    units: 3,
-    termType: 'Semester',
-    semester: '2nd Semester',
-    programCode: 'BSIT',
-    programName: 'BS Information Technology',
-    description: 'Relational database concepts, modeling, and SQL fundamentals.',
-    preReqs: ['IT102'],
-    coReqs: [],
-    addedDate: '2026-02-22'
-  },
-  {
-    id: 14,
-    code: 'IT310',
-    title: 'Systems Maintenance',
-    units: 2,
-    termType: 'Term',
-    semester: 'Midyear Term',
-    programCode: 'BSIT',
-    programName: 'BS Information Technology',
-    description: 'Maintenance planning, diagnostics, and system upkeep procedures.',
-    preReqs: ['IT201'],
-    coReqs: [],
-    addedDate: '2026-02-22'
-  },
-  {
-    id: 15,
-    code: 'IT420',
-    title: 'Human-Computer Interaction',
-    units: 3,
-    termType: 'Term',
-    semester: 'Midyear Term',
-    programCode: 'BSIT',
-    programName: 'BS Information Technology',
-    description: 'User-centered design, prototyping, and usability evaluation.',
-    preReqs: ['IT201'],
-    coReqs: [],
-    addedDate: '2026-02-22'
-  },
-  {
-    id: 16,
-    code: 'CS498',
-    title: 'Machine Learning Thesis / Capstone',
-    units: 4,
-    termType: 'Semester',
-    semester: '2nd Semester',
-    programCode: 'BSCS',
-    programName: 'BS Computer Science',
-    description: 'Capstone research project focused on machine learning applications.',
-    preReqs: ['CS401'],
-    coReqs: [],
-    addedDate: '2026-02-21'
-  },
-  {
-    id: 17,
-    code: 'CS499',
-    title: 'Capstone Project',
-    units: 4,
-    termType: 'Semester',
-    semester: '2nd Semester',
-    programCode: 'BSCS',
-    programName: 'BS Computer Science',
-    description: 'Team-based software capstone project with full delivery lifecycle.',
-    preReqs: ['CS301'],
-    coReqs: [],
-    addedDate: '2026-02-21'
-  },
-  {
-    id: 18,
-    code: 'CE320',
-    title: 'Hydraulics',
-    units: 3,
-    termType: 'Semester',
-    semester: '1st Semester',
-    programCode: 'BSCE',
-    programName: 'BS Computer Engineering',
-    description: 'Fluid properties, flow measurement, and hydraulic applications.',
-    preReqs: ['CE201'],
-    coReqs: [],
-    addedDate: '2026-02-20'
-  },
-  {
-    id: 19,
-    code: 'CE330',
-    title: 'Geotechnical Engineering',
-    units: 3,
-    termType: 'Semester',
-    semester: '2nd Semester',
-    programCode: 'BSCE',
-    programName: 'BS Computer Engineering',
-    description: 'Soil mechanics, foundation design, and site investigation.',
-    preReqs: ['CE201'],
-    coReqs: [],
-    addedDate: '2026-02-20'
-  },
-  {
-    id: 20,
-    code: 'DIT299',
-    title: 'On-the-Job Training (OJT)',
-    units: 2,
-    termType: 'Semester',
-    semester: '2nd Semester',
-    programCode: 'DIT',
-    programName: 'Diploma in Information Technology',
-    description: 'Supervised industry training with applied IT tasks.',
-    preReqs: ['DIT201'],
-    coReqs: [],
-    addedDate: '2026-02-19'
-  }
+const FIRST_NAMES = [
+  'Alex',
+  'Bianca',
+  'Carlo',
+  'Diana',
+  'Ethan',
+  'Faith',
+  'Gabriel',
+  'Hannah',
+  'Ivan',
+  'Julia',
+  'Kyle',
+  'Lara',
+  'Marco',
+  'Nina',
+  'Owen',
+  'Paula',
+  'Quinn',
+  'Rafael',
+  'Sofia',
+  'Tristan',
+  'Uma',
+  'Vince',
+  'Wendy',
+  'Xavier',
+  'Yasmin',
+  'Zach',
 ];
+
+const LAST_NAMES = [
+  'Dela Cruz',
+  'Santos',
+  'Reyes',
+  'Mendoza',
+  'Garcia',
+  'Ramos',
+  'Torres',
+  'Flores',
+  'Navarro',
+  'Diaz',
+  'Bautista',
+  'Castillo',
+  'Villanueva',
+  'Ortega',
+  'Mercado',
+  'Domingo',
+  'Valdez',
+  'Lopez',
+  'Rivera',
+  'Salazar',
+];
+
+const CITIES = [
+  'Quezon City',
+  'Manila',
+  'Caloocan',
+  'Pasig',
+  'Taguig',
+  'Makati',
+  'Marikina',
+  'Paranaque',
+  'Las Pinas',
+  'Mandaluyong',
+  'Antipolo',
+  'San Jose del Monte',
+];
+
+const PROVINCES = [
+  'Metro Manila',
+  'Rizal',
+  'Bulacan',
+  'Laguna',
+  'Cavite',
+  'Batangas',
+  'Pampanga',
+  'Tarlac',
+];
+
+const INCOME_BRACKETS = [
+  'Low Income',
+  'Lower-Middle Income',
+  'Middle Income',
+  'Upper-Middle Income',
+];
+
+const SCHOLARSHIP_STATUSES = ['None', 'Academic', 'Athletic', 'Government Grant'];
+const GENDER_CYCLE = ['Female', 'Male', 'Female', 'Male', 'Female', 'Male'];
+const STUDENT_STATUS_CYCLE = ['Active', 'Active', 'Active', 'Active', 'Pending', 'Inactive'];
+const UNITS_CYCLE = [15, 18, 21, 24];
+
+const toEmail = (name, id) =>
+  `${name.toLowerCase().replace(/[^a-z0-9]+/g, '.').replace(/\.+/g, '.').replace(/^\.|\.$/g, '')}${id}@student.morilla.edu`;
+
+const toOrdinal = (year) => {
+  if (year === 1) return '1st Year';
+  if (year === 2) return '2nd Year';
+  if (year === 3) return '3rd Year';
+  return `${year}th Year`;
+};
+
+export const studentsData = Array.from({ length: 500 }, (_, index) => {
+  const id = index + 1;
+  const firstName = FIRST_NAMES[index % FIRST_NAMES.length];
+  const lastName = LAST_NAMES[(index * 3) % LAST_NAMES.length];
+  const name = `${firstName} ${lastName}`;
+
+  const program = PROGRAM_CATALOG[index % PROGRAM_CATALOG.length];
+  const year = (index % 4) + 1;
+
+  const birthYear = 1999 + (index % 8);
+  const birthMonth = (index % 12) + 1;
+  const birthDay = ((index * 2) % 28) + 1;
+  const birthDate = `${birthYear}-${String(birthMonth).padStart(2, '0')}-${String(birthDay).padStart(2, '0')}`;
+  const age = 2026 - birthYear;
+
+  return {
+    id,
+    studentId: `2026-${String(id).padStart(4, '0')}`,
+    name,
+    email: toEmail(name, id),
+    program: program.name,
+    programCode: program.code,
+    department: program.department,
+    year,
+    yearLevel: toOrdinal(year),
+    status: STUDENT_STATUS_CYCLE[index % STUDENT_STATUS_CYCLE.length],
+    enrolledUnits: UNITS_CYCLE[index % UNITS_CYCLE.length],
+
+    // Demographic information
+    gender: GENDER_CYCLE[index % GENDER_CYCLE.length],
+    age,
+    birthDate,
+    city: CITIES[index % CITIES.length],
+    province: PROVINCES[index % PROVINCES.length],
+    householdIncomeBracket: INCOME_BRACKETS[index % INCOME_BRACKETS.length],
+    scholarshipStatus: SCHOLARSHIP_STATUSES[index % SCHOLARSHIP_STATUSES.length],
+    guardianName: `${FIRST_NAMES[(index + 7) % FIRST_NAMES.length]} ${lastName}`,
+    contactNumber: `09${String(10_000_000 + index).padStart(8, '0')}`,
+    entryYear: 2026 - (year - 1),
+  };
+});
+
+const COURSE_BLUEPRINTS = [
+  {
+    courseCode: 'CS101',
+    title: 'Introduction to Programming',
+    department: 'Computer Science',
+    units: 3,
+    instructor: 'Prof. Adrian Garcia',
+    semester: '1st Semester',
+    schedule: 'MWF 8:00-9:00 AM',
+    capacity: 45,
+    enrolled: 40,
+  },
+  {
+    courseCode: 'CS102',
+    title: 'Discrete Structures',
+    department: 'Computer Science',
+    units: 3,
+    instructor: 'Prof. Nina Torres',
+    semester: '1st Semester',
+    schedule: 'TTH 9:00-10:30 AM',
+    capacity: 40,
+    enrolled: 36,
+  },
+  {
+    courseCode: 'CS201',
+    title: 'Data Structures and Algorithms',
+    department: 'Computer Science',
+    units: 4,
+    instructor: 'Prof. Carlo Ramos',
+    semester: '2nd Semester',
+    schedule: 'MWF 9:00-10:00 AM',
+    capacity: 40,
+    enrolled: 38,
+  },
+  {
+    courseCode: 'CS220',
+    title: 'Object-Oriented Programming',
+    department: 'Computer Science',
+    units: 3,
+    instructor: 'Prof. Bianca Reyes',
+    semester: '2nd Semester',
+    schedule: 'TTH 1:00-2:30 PM',
+    capacity: 38,
+    enrolled: 34,
+  },
+  {
+    courseCode: 'CS301',
+    title: 'Operating Systems',
+    department: 'Computer Science',
+    units: 3,
+    instructor: 'Prof. Marco Villanueva',
+    semester: '1st Semester',
+    schedule: 'MWF 11:00-12:00 NN',
+    capacity: 35,
+    enrolled: 31,
+  },
+  {
+    courseCode: 'CS401',
+    title: 'Artificial Intelligence',
+    department: 'Computer Science',
+    units: 3,
+    instructor: 'Prof. Sofia Mendoza',
+    semester: '2nd Semester',
+    schedule: 'TTH 3:00-4:30 PM',
+    capacity: 32,
+    enrolled: 29,
+  },
+  {
+    courseCode: 'IT101',
+    title: 'Fundamentals of Information Technology',
+    department: 'Information Technology',
+    units: 3,
+    instructor: 'Prof. Hannah Flores',
+    semester: '1st Semester',
+    schedule: 'MWF 10:00-11:00 AM',
+    capacity: 45,
+    enrolled: 41,
+  },
+  {
+    courseCode: 'IT130',
+    title: 'Web Design and UX',
+    department: 'Information Technology',
+    units: 3,
+    instructor: 'Prof. Kyle Navarro',
+    semester: '1st Semester',
+    schedule: 'TTH 10:30-12:00 NN',
+    capacity: 35,
+    enrolled: 33,
+  },
+  {
+    courseCode: 'IT220',
+    title: 'Database Systems',
+    department: 'Information Technology',
+    units: 3,
+    instructor: 'Prof. Lara Diaz',
+    semester: '2nd Semester',
+    schedule: 'MWF 1:00-2:00 PM',
+    capacity: 40,
+    enrolled: 37,
+  },
+  {
+    courseCode: 'IT250',
+    title: 'Networking Essentials',
+    department: 'Information Technology',
+    units: 3,
+    instructor: 'Prof. Ivan Salazar',
+    semester: '2nd Semester',
+    schedule: 'TTH 8:00-9:30 AM',
+    capacity: 36,
+    enrolled: 30,
+  },
+  {
+    courseCode: 'IT310',
+    title: 'Information Assurance',
+    department: 'Information Technology',
+    units: 3,
+    instructor: 'Prof. Quentin Valdez',
+    semester: '1st Semester',
+    schedule: 'MWF 2:00-3:00 PM',
+    capacity: 32,
+    enrolled: 28,
+  },
+  {
+    courseCode: 'IT402',
+    title: 'Cloud Computing',
+    department: 'Information Technology',
+    units: 3,
+    instructor: 'Prof. Wendy Lopez',
+    semester: '2nd Semester',
+    schedule: 'TTH 4:00-5:30 PM',
+    capacity: 30,
+    enrolled: 26,
+  },
+  {
+    courseCode: 'IS210',
+    title: 'Systems Analysis and Design',
+    department: 'Information Systems',
+    units: 3,
+    instructor: 'Prof. Julia Castillo',
+    semester: '1st Semester',
+    schedule: 'MWF 9:00-10:00 AM',
+    capacity: 40,
+    enrolled: 32,
+  },
+  {
+    courseCode: 'IS320',
+    title: 'Enterprise Architecture',
+    department: 'Information Systems',
+    units: 3,
+    instructor: 'Prof. Tristan Rivera',
+    semester: '2nd Semester',
+    schedule: 'TTH 1:00-2:30 PM',
+    capacity: 36,
+    enrolled: 30,
+  },
+  {
+    courseCode: 'CPE101',
+    title: 'Computer Engineering Drafting',
+    department: 'Computer Engineering',
+    units: 2,
+    instructor: 'Prof. Ethan Bautista',
+    semester: '1st Semester',
+    schedule: 'MWF 8:00-9:00 AM',
+    capacity: 30,
+    enrolled: 27,
+  },
+  {
+    courseCode: 'CPE210',
+    title: 'Digital Logic and Design',
+    department: 'Computer Engineering',
+    units: 3,
+    instructor: 'Prof. Paula Ortega',
+    semester: '1st Semester',
+    schedule: 'TTH 2:30-4:00 PM',
+    capacity: 34,
+    enrolled: 29,
+  },
+  {
+    courseCode: 'CPE320',
+    title: 'Microprocessors',
+    department: 'Computer Engineering',
+    units: 4,
+    instructor: 'Prof. Rafael Mercado',
+    semester: '2nd Semester',
+    schedule: 'MWF 3:00-4:00 PM',
+    capacity: 34,
+    enrolled: 31,
+  },
+  {
+    courseCode: 'CPE410',
+    title: 'Embedded Systems',
+    department: 'Computer Engineering',
+    units: 3,
+    instructor: 'Prof. Yasmin Domingo',
+    semester: '2nd Semester',
+    schedule: 'TTH 9:00-10:30 AM',
+    capacity: 28,
+    enrolled: 24,
+  },
+  {
+    courseCode: 'GE101',
+    title: 'Communication Skills',
+    department: 'General Education',
+    units: 3,
+    instructor: 'Prof. Xavier Flores',
+    semester: '1st Semester',
+    schedule: 'MWF 11:00-12:00 NN',
+    capacity: 50,
+    enrolled: 46,
+  },
+  {
+    courseCode: 'GE202',
+    title: 'Philippine History and Society',
+    department: 'General Education',
+    units: 3,
+    instructor: 'Prof. Owen Navarro',
+    semester: '1st Semester',
+    schedule: 'TTH 10:00-11:30 AM',
+    capacity: 50,
+    enrolled: 44,
+  },
+  {
+    courseCode: 'GE303',
+    title: 'Science, Technology, and Society',
+    department: 'General Education',
+    units: 3,
+    instructor: 'Prof. Zach Torres',
+    semester: '2nd Semester',
+    schedule: 'TTH 3:00-4:30 PM',
+    capacity: 45,
+    enrolled: 40,
+  },
+];
+
+export const coursesData = COURSE_BLUEPRINTS.map((course, index) => {
+  const enrolled = 30;
+  const capacity = Math.max(course.capacity, enrolled + 10);
+  const available = capacity - enrolled;
+  return {
+    id: index + 1,
+    ...course,
+    enrolled,
+    capacity,
+    code: course.courseCode,
+    name: course.title,
+    available,
+    status: available > 0 ? 'Open' : 'Full',
+  };
+});
+
+const PROGRAM_SUBJECT_PREFIX = {
+  'Computer Science': 'BSCS',
+  'Information Technology': 'BSIT',
+  'Information Systems': 'BSIS',
+  'Computer Engineering': 'BSCPE',
+  'General Education': 'BSIS',
+};
+
+const buildYearLevels = (programCode, years) =>
+  Array.from({ length: years }, (_, index) => {
+    const yearNumber = index + 1;
+    return {
+      year: toOrdinal(yearNumber),
+      subjects: [
+        `${programCode}${yearNumber}01`,
+        `${programCode}${yearNumber}02`,
+        `${programCode}${yearNumber}03`,
+        `${programCode}${yearNumber}04`,
+      ],
+    };
+  });
+
+export const programsData = PROGRAM_CATALOG.map((program, index) => {
+  const studentCount = studentsData.filter((student) => student.programCode === program.code).length;
+  const years = Number(program.duration.charAt(0));
+
+  return {
+    id: index + 1,
+    code: program.code,
+    name: program.name,
+    type: "Bachelor's",
+    department: program.department,
+    duration: program.duration,
+    totalUnits: program.totalUnits,
+    studentCount,
+    status: program.status,
+    description: program.description,
+    yearLevels: buildYearLevels(program.code, years),
+    addedDate: `2026-0${(index % 5) + 1}-1${index % 9}`,
+  };
+});
+
+const SUBJECT_STATUS = (available) => (available > 0 ? 'Active' : 'Inactive');
+
+const subjectDescription = (course) =>
+  `${course.title} for ${course.department.toLowerCase()} focusing on practical competencies and assessment milestones.`;
+
+export const subjectsData = coursesData.map((course, index) => ({
+  id: index + 1,
+  code: course.courseCode,
+  name: course.title,
+  title: course.title,
+  units: course.units,
+  department: course.department,
+  semester: course.semester,
+  termType: 'Semester',
+  instructor: course.instructor,
+  enrolledStudents: course.enrolled,
+  status: SUBJECT_STATUS(course.available),
+  description: subjectDescription(course),
+  programCode: PROGRAM_SUBJECT_PREFIX[course.department] || 'BSCS',
+  programName:
+    PROGRAM_CATALOG.find((item) => item.code === (PROGRAM_SUBJECT_PREFIX[course.department] || 'BSCS'))?.name ||
+    'BS Computer Science',
+  preReqs: index % 4 === 0 ? [] : [coursesData[Math.max(0, index - 1)].courseCode],
+  coReqs: index % 6 === 0 ? [coursesData[Math.max(0, index - 2)].courseCode] : [],
+  addedDate: `2026-0${(index % 5) + 1}-${String((index % 20) + 1).padStart(2, '0')}`,
+}));
+
+const ENROLLMENT_START_DATE = new Date('2025-08-05T00:00:00');
+
+export const enrollmentData = subjectsData.flatMap((subject, subjectIndex) =>
+  Array.from({ length: 30 }, (_, entryIndex) => {
+    const id = subjectIndex * 30 + entryIndex + 1;
+    const student = studentsData[(subjectIndex * 29 + entryIndex) % studentsData.length];
+
+    const date = new Date(ENROLLMENT_START_DATE);
+    date.setDate(ENROLLMENT_START_DATE.getDate() + ((subjectIndex * 11 + entryIndex) % 280));
+    const enrollmentDate = formatDateIso(date);
+
+    let status = 'Enrolled';
+    if (entryIndex >= 24 && entryIndex < 28) {
+      status = 'Pending';
+    }
+    if (entryIndex >= 28) {
+      status = 'Dropped';
+    }
+
+    return {
+      id,
+      studentId: student.studentId,
+      studentName: student.name,
+      subjectCode: subject.code,
+      subjectName: subject.name,
+      courseCode: subject.code,
+      courseName: subject.name,
+      units: subject.units,
+      semester:
+        subject.semester === '1st Semester' ? '1st Semester 2025-2026' : '2nd Semester 2025-2026',
+      status,
+      enrollmentDate,
+      date: enrollmentDate,
+    };
+  }),
+);
+
+const HOLIDAYS = {
+  '2025-08-25': 'National Heroes Day',
+  '2025-11-27': 'University Foundation Holiday',
+  '2025-12-08': 'Feast of the Immaculate Conception',
+  '2025-12-25': 'Christmas Day',
+  '2026-01-01': 'New Year Day',
+  '2026-02-25': 'EDSA People Power Anniversary',
+  '2026-04-02': 'Maundy Thursday',
+  '2026-04-03': 'Good Friday',
+  '2026-04-09': 'Araw ng Kagitingan',
+  '2026-05-01': 'Labor Day',
+};
+
+const ACADEMIC_EVENTS = {
+  '2025-08-11': 'Opening Convocation',
+  '2025-09-08': 'Student Leadership Summit',
+  '2025-10-13': 'Midterm Examinations Start',
+  '2025-11-10': 'Research Colloquium',
+  '2025-12-15': 'Community Extension Day',
+  '2026-01-12': 'Second Semester Opening',
+  '2026-02-16': 'Career and Internship Fair',
+  '2026-03-16': 'Academic Festival Week',
+  '2026-04-20': 'Final Examination Review Week',
+  '2026-05-18': 'Capstone Defense Week',
+  '2026-05-25': 'Recognition and Awards Ceremony',
+};
+
+const attendanceBaseByWeekday = {
+  1: 92,
+  2: 90,
+  3: 91,
+  4: 89,
+  5: 87,
+};
+
+const buildSchoolDaysData = () => {
+  const start = new Date('2025-08-04T00:00:00');
+  const end = new Date('2026-05-29T00:00:00');
+
+  const rows = [];
+  let id = 1;
+  let classDayCounter = 0;
+
+  for (const date = new Date(start); date <= end; date.setDate(date.getDate() + 1)) {
+    const weekday = date.getDay();
+    if (weekday === 0 || weekday === 6) {
+      continue;
+    }
+
+    const iso = formatDateIso(date);
+
+    if (HOLIDAYS[iso]) {
+      rows.push({
+        id: id++,
+        date: iso,
+        type: 'holiday',
+        category: 'holiday',
+        title: HOLIDAYS[iso],
+        attendance_rate: null,
+        attendanceRate: null,
+        notes: 'No classes scheduled.',
+      });
+      continue;
+    }
+
+    const baseRate = attendanceBaseByWeekday[weekday] || 90;
+    const variation = (classDayCounter % 5) - 2;
+    const attendance = Math.max(82, Math.min(98, baseRate + variation));
+
+    if (ACADEMIC_EVENTS[iso]) {
+      rows.push({
+        id: id++,
+        date: iso,
+        type: 'event',
+        category: 'event',
+        title: ACADEMIC_EVENTS[iso],
+        attendance_rate: attendance,
+        attendanceRate: attendance,
+        notes: 'Academic event integrated with instructional activities.',
+      });
+      classDayCounter += 1;
+      continue;
+    }
+
+    rows.push({
+      id: id++,
+      date: iso,
+      type: 'class_day',
+      category: 'attendance',
+      title: 'Regular Class Day',
+      attendance_rate: attendance,
+      attendanceRate: attendance,
+      notes: 'Regular instruction day.',
+    });
+    classDayCounter += 1;
+  }
+
+  return rows;
+};
+
+export const schoolDaysData = buildSchoolDaysData();
+
+const monthOrder = ['Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May'];
+const monthFromDate = (value) => new Date(value).toLocaleDateString('en-US', { month: 'short' });
+
+const enrollmentByMonth = enrollmentData.reduce((accumulator, item) => {
+  const month = monthFromDate(item.enrollmentDate);
+  const current = accumulator.get(month) || 0;
+  accumulator.set(month, current + 1);
+  return accumulator;
+}, new Map());
+
+const programDistribution = programsData.map((program, index) => ({
+  name: program.name.replace('BS ', ''),
+  value: program.studentCount,
+  color: ['#800000', '#a00000', '#b22222', '#c14444', '#d16666', '#e18888'][index % 6],
+}));
+
+const recentActivities = schoolDaysData
+  .filter((item) => item.type === 'holiday' || item.type === 'event')
+  .slice(-8)
+  .reverse()
+  .map((item, index) => ({
+    id: index + 1,
+    type: item.type === 'event' ? 'student' : 'report',
+    message: `${item.type === 'event' ? 'Academic event' : 'Holiday'}: ${item.title}`,
+    time: new Date(item.date).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    }),
+  }));
+
+export const dashboardStats = {
+  totalStudents: studentsData.length,
+  totalCourses: coursesData.length,
+  activeEnrollments: enrollmentData.filter((item) => item.status === 'Enrolled').length,
+  pendingApprovals: enrollmentData.filter((item) => item.status === 'Pending').length,
+
+  enrollmentTrends: monthOrder.map((month) => ({
+    month,
+    enrollments: enrollmentByMonth.get(month) || 0,
+  })),
+
+  programDistribution,
+  recentActivities,
+};
+
 // API Integration Structure (for future Laravel backend)
 export const apiEndpoints = {
   students: '/api/students',
@@ -419,5 +702,5 @@ export const apiEndpoints = {
     login: '/api/auth/login',
     logout: '/api/auth/logout',
     profile: '/api/auth/profile',
-  }
+  },
 };
