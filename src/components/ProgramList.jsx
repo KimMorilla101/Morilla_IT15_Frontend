@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Search, Filter, BookPlus } from 'lucide-react';
 import Modal from './Modal';
 import { coursesData } from '../data/mockData';
-import { createCourse, fetchCourses, updateCourse } from '../services/schoolApi';
+import { createCourse, fetchCourses } from '../services/schoolApi';
 import '../styles/Pages.css';
 
 const COURSES_PER_PAGE = 15;
@@ -12,12 +12,15 @@ const EMPTY_COURSE_FORM = {
   code: '',
   title: '',
   department: '',
-  semester: '',
+  semester: '1st Semester',
   units: '3',
+  capacity: '40',
   instructor: '',
   status: 'active',
   description: '',
 };
+
+const SEMESTER_OPTIONS = ['1st Semester', '2nd Semester', 'Summer'];
 
 const formatStatusLabel = (value = '') =>
   String(value)
@@ -34,6 +37,62 @@ const normalizeStatusValue = (value = '') => {
   return 'active';
 };
 
+const normalizeSemesterValue = (value = '') => {
+  const rawValue = String(value || '').trim();
+  if (!rawValue) {
+    return '';
+  }
+
+  const normalized = rawValue
+    .toLowerCase()
+    .replace(/[_-]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  if (
+    normalized === '1' ||
+    normalized === '1st' ||
+    normalized === 'first' ||
+    normalized === 'sem 1' ||
+    normalized === 'semester 1' ||
+    normalized === '1st sem' ||
+    normalized === '1st semester' ||
+    normalized === 'first sem' ||
+    normalized === 'first semester'
+  ) {
+    return '1st Semester';
+  }
+
+  if (
+    normalized === '2' ||
+    normalized === '2nd' ||
+    normalized === 'second' ||
+    normalized === 'sem 2' ||
+    normalized === 'semester 2' ||
+    normalized === '2nd sem' ||
+    normalized === '2nd semester' ||
+    normalized === 'second sem' ||
+    normalized === 'second semester'
+  ) {
+    return '2nd Semester';
+  }
+
+  if (
+    normalized === '3' ||
+    normalized === '3rd' ||
+    normalized === 'third' ||
+    normalized === 'sem 3' ||
+    normalized === 'semester 3' ||
+    normalized === 'summer' ||
+    normalized === 'midyear' ||
+    normalized === 'mid year'
+  ) {
+    return 'Summer';
+  }
+
+  return rawValue;
+};
+
 const toStatusTone = (value = '') => {
   const normalized = normalizeStatusValue(value);
   if (normalized === 'inactive') {
@@ -48,8 +107,18 @@ const toStatusTone = (value = '') => {
 };
 
 const mapCourse = (course) => {
+  const resolvedActiveValue =
+    course?.active ??
+    course?.is_active ??
+    course?.isActive ??
+    (typeof course?.status === 'string' ? undefined : null);
+  const isInactiveFromActiveFlag =
+    resolvedActiveValue === false ||
+    resolvedActiveValue === 0 ||
+    resolvedActiveValue === '0' ||
+    resolvedActiveValue === 'false';
   const statusValue = normalizeStatusValue(
-    course?.status || (course?.active === false ? 'inactive' : 'active'),
+    course?.status || (isInactiveFromActiveFlag ? 'inactive' : 'active'),
   );
 
   return {
@@ -57,8 +126,9 @@ const mapCourse = (course) => {
     code: course?.code || course?.course_code || 'N/A',
     title: course?.title || course?.name || 'Untitled Course',
     department: course?.department || 'Unassigned',
-    semester: course?.semester || 'N/A',
+    semester: normalizeSemesterValue(course?.semester) || 'N/A',
     units: Number(course?.credits ?? course?.units ?? 0),
+    capacity: Number(course?.capacity ?? course?.max_students ?? course?.maxStudents ?? 0),
     instructor: course?.instructor || 'TBA',
     enrolledCount: Number(
       course?.enrolled_students ?? course?.enrolled ?? course?.students_count ?? 0,
@@ -78,8 +148,9 @@ const mapMockCourse = (course) => {
     code: course?.courseCode || course?.code || 'N/A',
     title: course?.title || course?.name || 'Untitled Course',
     department: course?.department || 'Unassigned',
-    semester: course?.semester || 'N/A',
+    semester: normalizeSemesterValue(course?.semester) || 'N/A',
     units: Number(course?.units || 0),
+    capacity: Number(course?.capacity || 0),
     instructor: course?.instructor || 'TBA',
     enrolledCount: Number(course?.enrolled || 0),
     statusValue,
@@ -122,31 +193,16 @@ const paginateCourses = (items, page) => {
   };
 };
 
-const buildCourseForm = (course = null) => {
-  if (!course) {
-    return { ...EMPTY_COURSE_FORM };
-  }
-
-  return {
-    code: course.code,
-    title: course.title,
-    department: course.department,
-    semester: course.semester === 'N/A' ? '' : course.semester,
-    units: String(course.units || 0),
-    instructor: course.instructor === 'TBA' ? '' : course.instructor,
-    status: course.statusValue,
-    description: course.description === 'No description provided.' ? '' : course.description,
-  };
-};
-
 const buildCoursePayload = (courseForm) => {
   const code = courseForm.code.trim();
   const title = courseForm.title.trim();
   const department = courseForm.department.trim();
-  const semester = courseForm.semester.trim();
+  const semester = normalizeSemesterValue(courseForm.semester);
   const units = Math.max(0, Number(courseForm.units || 0));
+  const capacity = Math.max(1, Math.round(Number(courseForm.capacity || 0)));
   const instructor = courseForm.instructor.trim();
   const status = normalizeStatusValue(courseForm.status);
+  const isActive = status !== 'inactive';
 
   return {
     course_code: code,
@@ -157,9 +213,14 @@ const buildCoursePayload = (courseForm) => {
     semester: semester || null,
     credits: units,
     units,
+    capacity,
+    max_students: capacity,
+    maxStudents: capacity,
     instructor: instructor || null,
     status,
-    active: status !== 'inactive',
+    active: isActive,
+    is_active: isActive ? 1 : 0,
+    isActive,
     description: courseForm.description.trim() || null,
   };
 };
@@ -183,15 +244,14 @@ const extractErrorMessage = (error, fallbackMessage) => {
 
 const ProgramList = () => {
   const [courses, setCourses] = useState([]);
-  const [localCourses, setLocalCourses] = useState(() => coursesData.map(mapMockCourse));
-  const [isBackendAvailable, setIsBackendAvailable] = useState(true);
+  const [localCourses] = useState(() => coursesData.map(mapMockCourse));
+  const [, setIsBackendAvailable] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [filterDepartment, setFilterDepartment] = useState('All');
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [showViewModal, setShowViewModal] = useState(false);
   const [showFormModal, setShowFormModal] = useState(false);
-  const [editingCourse, setEditingCourse] = useState(null);
   const [courseForm, setCourseForm] = useState({ ...EMPTY_COURSE_FORM });
   const [error, setError] = useState('');
   const [formError, setFormError] = useState('');
@@ -285,23 +345,13 @@ const ProgramList = () => {
   };
 
   const openCreateModal = () => {
-    setEditingCourse(null);
     setCourseForm({ ...EMPTY_COURSE_FORM });
-    setFormError('');
-    setShowFormModal(true);
-  };
-
-  const openEditModal = (course) => {
-    setShowViewModal(false);
-    setEditingCourse(course);
-    setCourseForm(buildCourseForm(course));
     setFormError('');
     setShowFormModal(true);
   };
 
   const closeFormModal = () => {
     setShowFormModal(false);
-    setEditingCourse(null);
     setCourseForm({ ...EMPTY_COURSE_FORM });
     setFormError('');
   };
@@ -324,9 +374,15 @@ const ProgramList = () => {
     const code = courseForm.code.trim();
     const title = courseForm.title.trim();
     const department = courseForm.department.trim();
+    const capacity = Number(courseForm.capacity);
 
     if (!code || !title || !department) {
       setFormError('Please complete course code, title, and department.');
+      return;
+    }
+
+    if (!Number.isFinite(capacity) || capacity < 1) {
+      setFormError('Please provide a valid capacity (at least 1).');
       return;
     }
 
@@ -335,36 +391,7 @@ const ProgramList = () => {
 
     try {
       const payload = buildCoursePayload(courseForm);
-
-      if (isBackendAvailable) {
-        if (editingCourse?.id) {
-          await updateCourse(editingCourse.id, payload, 'PATCH');
-        } else {
-          await createCourse(payload);
-        }
-      } else {
-        const mappedCourse = mapCourse(payload);
-        const nextCourse = {
-          ...mappedCourse,
-          id: editingCourse?.id || Date.now(),
-          enrolledCount: editingCourse?.enrolledCount || 0,
-        };
-
-        setLocalCourses((current) => {
-          if (editingCourse?.id) {
-            return current.map((course) =>
-              course.id === editingCourse.id
-                ? {
-                    ...course,
-                    ...nextCourse,
-                  }
-                : course,
-            );
-          }
-
-          return [nextCourse, ...current];
-        });
-      }
+      await createCourse(payload);
 
       closeFormModal();
       setPage(1);
@@ -470,9 +497,6 @@ const ProgramList = () => {
                       <button className="btn-sm btn-view" onClick={() => handleViewCourse(course)}>
                         View
                       </button>
-                      <button className="btn-sm btn-edit" onClick={() => openEditModal(course)}>
-                        Edit
-                      </button>
                     </div>
                   </td>
                 </motion.tr>
@@ -572,9 +596,6 @@ const ProgramList = () => {
               <button className="modal-btn modal-btn-secondary" onClick={() => setShowViewModal(false)}>
                 Close
               </button>
-              <button className="modal-btn modal-btn-primary" onClick={() => openEditModal(selectedCourse)}>
-                Edit Course
-              </button>
             </div>
           </>
         )}
@@ -583,7 +604,7 @@ const ProgramList = () => {
       <Modal
         isOpen={showFormModal}
         onClose={closeFormModal}
-        title={editingCourse ? 'Edit Course' : 'Add Course'}
+        title="Add Course"
         size="medium"
       >
         <form onSubmit={handleSubmitCourse}>
@@ -626,14 +647,18 @@ const ProgramList = () => {
             </div>
             <div className="modal-form-group">
               <label htmlFor="semester">Semester</label>
-              <input
+              <select
                 id="semester"
                 name="semester"
-                type="text"
                 value={courseForm.semester}
                 onChange={handleCourseFormChange}
-                placeholder="1st Semester"
-              />
+              >
+                {SEMESTER_OPTIONS.map((semesterOption) => (
+                  <option key={semesterOption} value={semesterOption}>
+                    {semesterOption}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
@@ -649,6 +674,20 @@ const ProgramList = () => {
                 onChange={handleCourseFormChange}
               />
             </div>
+            <div className="modal-form-group">
+              <label htmlFor="capacity">Capacity</label>
+              <input
+                id="capacity"
+                name="capacity"
+                type="number"
+                min="1"
+                value={courseForm.capacity}
+                onChange={handleCourseFormChange}
+              />
+            </div>
+          </div>
+
+          <div className="modal-info-grid">
             <div className="modal-form-group">
               <label htmlFor="status">Status</label>
               <select
@@ -694,7 +733,7 @@ const ProgramList = () => {
               Cancel
             </button>
             <button type="submit" className="modal-btn modal-btn-primary" disabled={isSubmitting}>
-              {isSubmitting ? 'Saving...' : editingCourse ? 'Save Changes' : 'Create Course'}
+              {isSubmitting ? 'Saving...' : 'Create Course'}
             </button>
           </div>
         </form>

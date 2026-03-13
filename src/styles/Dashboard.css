@@ -493,7 +493,6 @@
 .activity-badge.course { background: #c00000; }
 .activity-badge.report { background: #d00000; }
 .activity-badge.program { background: #800000; }
-.activity-badge.subject { background: #a00000; }
 
 .activity-details {
   flex: 1;

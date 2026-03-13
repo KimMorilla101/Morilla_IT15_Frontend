@@ -41,8 +41,6 @@ const Login = () => {
   const [touched, setTouched] = useState({ email: false, password: false });
 
   useEffect(() => {
-    // If user arrives at login via browser back/forward navigation,
-    // force a fresh auth cycle before protected pages can be opened again.
     if (navigationType === 'POP') {
       localStorage.removeItem('token');
       localStorage.removeItem('isAuthenticated');
@@ -84,7 +82,6 @@ const Login = () => {
     } catch (requestError) {
       let errorMessage = requestError.message;
       
-      // If it's a network error, provide more helpful debugging info
       if (!errorMessage || errorMessage.includes('Failed to fetch')) {
         errorMessage = `Backend server not responding. Make sure your Laravel server is running and reachable at ${apiBaseUrl}`;
       }

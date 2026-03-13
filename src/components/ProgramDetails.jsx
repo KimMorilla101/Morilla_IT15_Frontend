@@ -5,7 +5,7 @@ const getStatusClass = (status) => {
   return 'pending';
 };
 
-const ProgramDetails = ({ program, subjectsByCode }) => {
+const ProgramDetails = ({ program, coursesByCode = {} }) => {
   if (!program) return null;
 
   return (
@@ -56,14 +56,14 @@ const ProgramDetails = ({ program, subjectsByCode }) => {
       </div>
 
       <div className="modal-form-group">
-        <label>Subjects by Year Level</label>
+        <label>Courses by Year Level</label>
         {program.yearLevels.map((level) => (
           <div key={level.year} style={{ marginBottom: '12px' }}>
             <strong>{level.year}</strong>
             <div style={{ marginTop: '8px' }}>
-              {level.subjects.map((subjectCode) => (
-                <div key={subjectCode} style={{ fontSize: '14px', marginBottom: '6px' }}>
-                  {subjectCode} - {subjectsByCode[subjectCode]?.title || 'TBD'}
+              {(level.courses || []).map((courseCode) => (
+                <div key={courseCode} style={{ fontSize: '14px', marginBottom: '6px' }}>
+                  {courseCode} - {coursesByCode[courseCode]?.title || 'TBD'}
                 </div>
               ))}
             </div>

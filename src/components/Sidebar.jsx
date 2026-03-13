@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
   Home,
-  BookOpen,
   LogOut,
   X,
   Layers,
@@ -85,7 +84,6 @@ const Sidebar = ({ isOpen, closeSidebar }) => {
     { path: '/dashboard', icon: Home, label: 'Dashboard' },
     { path: '/students', icon: Users, label: 'Students' },
     { path: '/programs', icon: Layers, label: 'Courses' },
-    { path: '/subjects', icon: BookOpen, label: 'Subjects' },
     { path: '/academic-calendar', icon: CalendarDays, label: 'Academic Calendar' },
   ];
 

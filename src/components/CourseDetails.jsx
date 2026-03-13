@@ -9,38 +9,38 @@ const formatList = (items) => {
   return items.join(', ');
 };
 
-const SubjectDetails = ({ subject }) => {
-  if (!subject) return null;
+const CourseDetails = ({ course }) => {
+  if (!course) return null;
 
-  const termStyle = termStyles[subject.termType] || termStyles.Semester;
+  const termStyle = termStyles[course.termType] || termStyles.Semester;
 
   return (
     <>
       <div className="modal-info-grid">
         <div className="modal-info-item">
-          <span className="modal-info-label">Subject Code</span>
-          <span className="modal-info-value">{subject.code}</span>
+          <span className="modal-info-label">Course Code</span>
+          <span className="modal-info-value">{course.code}</span>
         </div>
         <div className="modal-info-item">
           <span className="modal-info-label">Units</span>
-          <span className="modal-info-value">{subject.units}</span>
+          <span className="modal-info-value">{course.units}</span>
         </div>
       </div>
 
       <div className="modal-form-group">
-        <label>Subject Title</label>
-        <input type="text" value={subject.title} readOnly />
+        <label>Course Title</label>
+        <input type="text" value={course.title} readOnly />
       </div>
 
       <div className="modal-info-grid">
         <div className="modal-info-item">
           <span className="modal-info-label">Semester/Term</span>
-          <span className="modal-info-value">{subject.semester}</span>
+          <span className="modal-info-value">{course.semester}</span>
         </div>
         <div className="modal-info-item">
           <span className="modal-info-label">Offer Type</span>
           <span style={{ ...termStyle, padding: '8px 16px', borderRadius: '20px', fontSize: '14px', fontWeight: 600 }}>
-            {subject.termType}
+            {course.termType}
           </span>
         </div>
       </div>
@@ -48,27 +48,27 @@ const SubjectDetails = ({ subject }) => {
       <div className="modal-info-grid">
         <div className="modal-info-item">
           <span className="modal-info-label">Pre-requisites</span>
-          <span className="modal-info-value">{formatList(subject.preReqs)}</span>
+          <span className="modal-info-value">{formatList(course.preReqs)}</span>
         </div>
         <div className="modal-info-item">
           <span className="modal-info-label">Co-requisites</span>
-          <span className="modal-info-value">{formatList(subject.coReqs)}</span>
+          <span className="modal-info-value">{formatList(course.coReqs)}</span>
         </div>
       </div>
 
       <div className="modal-form-group">
         <label>Description</label>
-        <textarea value={subject.description} readOnly />
+        <textarea value={course.description} readOnly />
       </div>
 
       <div className="modal-info-grid">
         <div className="modal-info-item">
           <span className="modal-info-label">Program Assignment</span>
-          <span className="modal-info-value">{subject.programName}</span>
+          <span className="modal-info-value">{course.programName}</span>
         </div>
       </div>
     </>
   );
 };
 
-export default SubjectDetails;
+export default CourseDetails;

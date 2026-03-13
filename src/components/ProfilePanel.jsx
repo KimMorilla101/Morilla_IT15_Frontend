@@ -47,7 +47,7 @@ const ProfilePanel = () => {
       setProfile(data.profile || data.user || data);
     } catch (err) {
       console.error('Failed to fetch profile:', err);
-      // Fallback to cached profile or user ID
+
       const cached = localStorage.getItem('profile');
       if (cached) {
         setProfile(JSON.parse(cached));

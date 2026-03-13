@@ -9,7 +9,6 @@ import AcademicCalendar from './pages/AcademicCalendar';
 import Reports from './pages/Reports';
 import Settings from './pages/Settings';
 import Programs from './pages/Programs';
-import Subjects from './pages/Subjects';
 import ProtectedRoute from './components/ProtectedRoute';
 import './App.css';
 
@@ -37,7 +36,6 @@ function App() {
             <Route path="reports" element={<Reports />} />
             <Route path="settings" element={<Settings />} />
             <Route path="programs" element={<Programs />} />
-            <Route path="subjects" element={<Subjects />} />
           </Route>
 
           {/* Fallback Route */}

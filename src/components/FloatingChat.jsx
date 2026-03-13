@@ -24,7 +24,6 @@ const FloatingChat = () => {
     setMessages([...messages, newMessage]);
     setInputMessage('');
 
-    // Simulate bot response
     setTimeout(() => {
       const botResponse = {
         id: messages.length + 2,

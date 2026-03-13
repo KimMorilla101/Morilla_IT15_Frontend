@@ -115,7 +115,6 @@ const extractCollection = (payload, preferredKeys = []) => {
     'items',
     'results',
     'programs',
-    'subjects',
     'enrollments',
     'students',
     'courses',
@@ -278,8 +277,145 @@ export const fetchCourse = async (courseId) => {
   return extractEntity(payload, ['course']);
 };
 
+const buildSemesterCandidates = (value) => {
+  const initial = String(value ?? '').trim();
+  if (!initial) {
+    return [initial];
+  }
+
+  const normalized = initial
+    .toLowerCase()
+    .replace(/[_-]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  const candidates = [initial];
+
+  const appendCandidates = (items) => {
+    items.forEach((item) => {
+      const candidate = String(item ?? '').trim();
+      if (candidate && !candidates.includes(candidate)) {
+        candidates.push(candidate);
+      }
+    });
+  };
+
+  const isFirstSemester =
+    normalized === '1' ||
+    normalized === '1st' ||
+    normalized === 'first' ||
+    normalized === 'sem 1' ||
+    normalized === 'semester 1' ||
+    normalized === '1st sem' ||
+    normalized === '1st semester' ||
+    normalized === 'first sem' ||
+    normalized === 'first semester';
+
+  const isSecondSemester =
+    normalized === '2' ||
+    normalized === '2nd' ||
+    normalized === 'second' ||
+    normalized === 'sem 2' ||
+    normalized === 'semester 2' ||
+    normalized === '2nd sem' ||
+    normalized === '2nd semester' ||
+    normalized === 'second sem' ||
+    normalized === 'second semester';
+
+  const isSummerTerm =
+    normalized === '3' ||
+    normalized === '3rd' ||
+    normalized === 'third' ||
+    normalized === 'sem 3' ||
+    normalized === 'semester 3' ||
+    normalized === 'summer' ||
+    normalized === 'midyear' ||
+    normalized === 'mid year';
+
+  if (isFirstSemester) {
+    appendCandidates(['1st Semester', 'First Semester', 'first_semester', 'first', '1', '1st']);
+  }
+
+  if (isSecondSemester) {
+    appendCandidates(['2nd Semester', 'Second Semester', 'second_semester', 'second', '2', '2nd']);
+  }
+
+  if (isSummerTerm) {
+    appendCandidates(['Summer', 'summer_term', 'summer', '3', '3rd']);
+  }
+
+  return candidates;
+};
+
+const hasInvalidSemesterError = (error) => {
+  const messageText = String(error?.message || '').toLowerCase();
+  const detailText =
+    error?.details && typeof error.details === 'object'
+      ? JSON.stringify(error.details).toLowerCase()
+      : String(error?.details || '').toLowerCase();
+
+  if (detailText.includes('semester') && detailText.includes('invalid')) {
+    return true;
+  }
+
+  return messageText.includes('semester') && messageText.includes('invalid');
+};
+
+const requestWithSemesterRetry = async (pathOrPaths, { method = 'POST', body } = {}) => {
+  const hasSemesterField = body && Object.prototype.hasOwnProperty.call(body, 'semester');
+
+  const sendRequest = (semesterValue) => {
+    const nextBody =
+      hasSemesterField && semesterValue !== undefined
+        ? {
+            ...body,
+            semester: semesterValue,
+          }
+        : body;
+
+    if (Array.isArray(pathOrPaths)) {
+      return requestWithFallback(pathOrPaths, {
+        method,
+        body: nextBody,
+      });
+    }
+
+    return request(pathOrPaths, {
+      method,
+      body: nextBody,
+    });
+  };
+
+  if (!hasSemesterField) {
+    return sendRequest(undefined);
+  }
+
+  const semesterCandidates = buildSemesterCandidates(body?.semester);
+  if (semesterCandidates.length <= 1) {
+    return sendRequest(semesterCandidates[0]);
+  }
+
+  let lastError = null;
+
+  for (let index = 0; index < semesterCandidates.length; index += 1) {
+    const semesterCandidate = semesterCandidates[index];
+
+    try {
+      return await sendRequest(semesterCandidate);
+    } catch (error) {
+      lastError = error;
+
+      if (!hasInvalidSemesterError(error) || index === semesterCandidates.length - 1) {
+        throw error;
+      }
+    }
+  }
+
+  throw lastError || new SchoolApiError('Request failed. Please try again.');
+};
+
 export const createCourse = async (coursePayload) => {
-  const payload = await request('/courses', {
+  const payload = await requestWithSemesterRetry('/courses', {
     method: 'POST',
     body: coursePayload,
   });
@@ -288,7 +424,7 @@ export const createCourse = async (coursePayload) => {
 };
 
 export const updateCourse = async (courseId, coursePayload, method = 'PATCH') => {
-  const payload = await request(`/courses/${courseId}`, {
+  const payload = await requestWithSemesterRetry(`/courses/${courseId}`, {
     method,
     body: coursePayload,
   });
@@ -296,7 +432,6 @@ export const updateCourse = async (courseId, coursePayload, method = 'PATCH') =>
   return extractEntity(payload, ['course']);
 };
 
-const SUBJECT_PATHS = ['/subjects', '/courses'];
 const ENROLLMENT_PATHS = ['/enrollments', '/student-enrollments'];
 
 const mapProgramPayloadToCoursePayload = (programPayload = {}) => {
@@ -318,6 +453,7 @@ const mapProgramPayloadToCoursePayload = (programPayload = {}) => {
       : status
       ? status !== 'inactive'
       : undefined;
+  const hasExplicitActive = typeof active === 'boolean';
 
   return {
     ...programPayload,
@@ -328,6 +464,7 @@ const mapProgramPayloadToCoursePayload = (programPayload = {}) => {
     credits,
     units: credits,
     active,
+    ...(hasExplicitActive ? { is_active: active ? 1 : 0, isActive: active } : {}),
   };
 };
 
@@ -367,56 +504,6 @@ export const createProgram = async (programPayload) => {
 
 export const updateProgram = async (programId, programPayload, method = 'PATCH') => {
   return updateCourse(programId, mapProgramPayloadToCoursePayload(programPayload), method);
-};
-
-export const fetchSubjects = async ({
-  search,
-  department,
-  semester,
-  status,
-  page = 1,
-  perPage = 15,
-} = {}) => {
-  const payload = await requestWithFallback(SUBJECT_PATHS, {
-    query: {
-      search,
-      department,
-      semester,
-      status,
-      page,
-      per_page: perPage,
-    },
-  });
-
-  const items = extractCollection(payload, ['subjects', 'courses']);
-
-  return {
-    items,
-    pagination: mapPagination(payload, perPage, items.length),
-  };
-};
-
-export const fetchSubject = async (subjectId) => {
-  const payload = await requestWithFallback(SUBJECT_PATHS.map((path) => `${path}/${subjectId}`));
-  return extractEntity(payload, ['subject', 'course']);
-};
-
-export const createSubject = async (subjectPayload) => {
-  const payload = await requestWithFallback(SUBJECT_PATHS, {
-    method: 'POST',
-    body: subjectPayload,
-  });
-
-  return extractEntity(payload, ['subject', 'course']);
-};
-
-export const updateSubject = async (subjectId, subjectPayload, method = 'PATCH') => {
-  const payload = await requestWithFallback(SUBJECT_PATHS.map((path) => `${path}/${subjectId}`), {
-    method,
-    body: subjectPayload,
-  });
-
-  return extractEntity(payload, ['subject', 'course']);
 };
 
 const fetchAllStudentsForEnrollmentFallback = async () => {

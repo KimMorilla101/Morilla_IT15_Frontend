@@ -438,7 +438,7 @@ export const coursesData = COURSE_BLUEPRINTS.map((course, index) => {
   };
 });
 
-const PROGRAM_SUBJECT_PREFIX = {
+const PROGRAM_COURSE_PREFIX = {
   'Computer Science': 'BSCS',
   'Information Technology': 'BSIT',
   'Information Systems': 'BSIS',
@@ -451,7 +451,7 @@ const buildYearLevels = (programCode, years) =>
     const yearNumber = index + 1;
     return {
       year: toOrdinal(yearNumber),
-      subjects: [
+      courses: [
         `${programCode}${yearNumber}01`,
         `${programCode}${yearNumber}02`,
         `${programCode}${yearNumber}03`,
@@ -480,12 +480,12 @@ export const programsData = PROGRAM_CATALOG.map((program, index) => {
   };
 });
 
-const SUBJECT_STATUS = (available) => (available > 0 ? 'Active' : 'Inactive');
+const COURSE_STATUS = (available) => (available > 0 ? 'Active' : 'Inactive');
 
-const subjectDescription = (course) =>
+const courseDescription = (course) =>
   `${course.title} for ${course.department.toLowerCase()} focusing on practical competencies and assessment milestones.`;
 
-export const subjectsData = coursesData.map((course, index) => ({
+export const courseCatalogData = coursesData.map((course, index) => ({
   id: index + 1,
   code: course.courseCode,
   name: course.title,
@@ -496,11 +496,11 @@ export const subjectsData = coursesData.map((course, index) => ({
   termType: 'Semester',
   instructor: course.instructor,
   enrolledStudents: course.enrolled,
-  status: SUBJECT_STATUS(course.available),
-  description: subjectDescription(course),
-  programCode: PROGRAM_SUBJECT_PREFIX[course.department] || 'BSCS',
+  status: COURSE_STATUS(course.available),
+  description: courseDescription(course),
+  programCode: PROGRAM_COURSE_PREFIX[course.department] || 'BSCS',
   programName:
-    PROGRAM_CATALOG.find((item) => item.code === (PROGRAM_SUBJECT_PREFIX[course.department] || 'BSCS'))?.name ||
+    PROGRAM_CATALOG.find((item) => item.code === (PROGRAM_COURSE_PREFIX[course.department] || 'BSCS'))?.name ||
     'BS Computer Science',
   preReqs: index % 4 === 0 ? [] : [coursesData[Math.max(0, index - 1)].courseCode],
   coReqs: index % 6 === 0 ? [coursesData[Math.max(0, index - 2)].courseCode] : [],
@@ -509,13 +509,13 @@ export const subjectsData = coursesData.map((course, index) => ({
 
 const ENROLLMENT_START_DATE = new Date('2025-08-05T00:00:00');
 
-export const enrollmentData = subjectsData.flatMap((subject, subjectIndex) =>
+export const enrollmentData = courseCatalogData.flatMap((course, courseIndex) =>
   Array.from({ length: 30 }, (_, entryIndex) => {
-    const id = subjectIndex * 30 + entryIndex + 1;
-    const student = studentsData[(subjectIndex * 29 + entryIndex) % studentsData.length];
+    const id = courseIndex * 30 + entryIndex + 1;
+    const student = studentsData[(courseIndex * 29 + entryIndex) % studentsData.length];
 
     const date = new Date(ENROLLMENT_START_DATE);
-    date.setDate(ENROLLMENT_START_DATE.getDate() + ((subjectIndex * 11 + entryIndex) % 280));
+    date.setDate(ENROLLMENT_START_DATE.getDate() + ((courseIndex * 11 + entryIndex) % 280));
     const enrollmentDate = formatDateIso(date);
 
     let status = 'Enrolled';
@@ -530,13 +530,11 @@ export const enrollmentData = subjectsData.flatMap((subject, subjectIndex) =>
       id,
       studentId: student.studentId,
       studentName: student.name,
-      subjectCode: subject.code,
-      subjectName: subject.name,
-      courseCode: subject.code,
-      courseName: subject.name,
-      units: subject.units,
+      courseCode: course.code,
+      courseName: course.name,
+      units: course.units,
       semester:
-        subject.semester === '1st Semester' ? '1st Semester 2025-2026' : '2nd Semester 2025-2026',
+        course.semester === '1st Semester' ? '1st Semester 2025-2026' : '2nd Semester 2025-2026',
       status,
       enrollmentDate,
       date: enrollmentDate,

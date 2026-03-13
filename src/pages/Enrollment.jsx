@@ -94,19 +94,17 @@ const mapEnrollment = (enrollment) => {
       [enrollment?.student?.first_name, enrollment?.student?.last_name].filter(Boolean).join(' ').trim() ||
       'Unnamed Student',
     courseBackendId,
-    subjectCode:
+    courseCode:
       enrollment?.course_code ||
-      enrollment?.subject_code ||
-      enrollment?.subjectCode ||
+      enrollment?.courseCode ||
       enrollment?.course?.code ||
       'N/A',
-    subjectName:
+    courseName:
       enrollment?.course_name ||
-      enrollment?.subject_name ||
-      enrollment?.subjectName ||
+      enrollment?.courseName ||
       enrollment?.course?.title ||
       enrollment?.course?.name ||
-      'Untitled Subject',
+      'Untitled Course',
     units: Number(
       enrollment?.credits ||
         enrollment?.units ||
@@ -140,7 +138,7 @@ const mapStudentOption = (student) => {
 const mapCourseOption = (course) => ({
   id: Number(course?.id || 0),
   code: course?.code || course?.course_code || 'N/A',
-  title: course?.title || course?.name || 'Untitled Subject',
+  title: course?.title || course?.name || 'Untitled Course',
   semester: course?.semester || '',
   units: Number(course?.credits || course?.units || 0),
 });
@@ -355,7 +353,7 @@ const Enrollment = () => {
     const courseId = Number(enrollmentForm.courseId || 0);
 
     if (!studentId || !courseId || !enrollmentForm.enrollmentDate) {
-      setFormError('Please select student, subject, and enrollment date.');
+      setFormError('Please select student, course, and enrollment date.');
       return;
     }
 
@@ -407,7 +405,7 @@ const Enrollment = () => {
       <div className="page-header">
         <div>
           <h1>Enrollment</h1>
-          <p>Manage student subject enrollments</p>
+          <p>Manage student course enrollments</p>
         </div>
         <button
           className="primary-btn"
@@ -460,8 +458,8 @@ const Enrollment = () => {
             <tr>
               <th>Student ID</th>
               <th>Student Name</th>
-              <th>Subject Code</th>
-              <th>Subject Name</th>
+              <th>Course Code</th>
+              <th>Course Name</th>
               <th>Units</th>
               <th>Semester</th>
               <th>Date</th>
@@ -492,8 +490,8 @@ const Enrollment = () => {
                 >
                   <td className="font-weight-bold">{enrollment.studentId}</td>
                   <td>{enrollment.studentName}</td>
-                  <td className="font-weight-bold">{enrollment.subjectCode}</td>
-                  <td>{enrollment.subjectName}</td>
+                  <td className="font-weight-bold">{enrollment.courseCode}</td>
+                  <td>{enrollment.courseName}</td>
                   <td>{enrollment.units}</td>
                   <td>{enrollment.semester}</td>
                   <td>
@@ -570,12 +568,12 @@ const Enrollment = () => {
 
             <div className="modal-info-grid">
               <div className="modal-info-item">
-                <span className="modal-info-label">Subject Code</span>
-                <span className="modal-info-value">{selectedEnrollment.subjectCode}</span>
+                <span className="modal-info-label">Course Code</span>
+                <span className="modal-info-value">{selectedEnrollment.courseCode}</span>
               </div>
               <div className="modal-info-item">
-                <span className="modal-info-label">Subject Name</span>
-                <span className="modal-info-value">{selectedEnrollment.subjectName}</span>
+                <span className="modal-info-label">Course Name</span>
+                <span className="modal-info-value">{selectedEnrollment.courseName}</span>
               </div>
             </div>
 
@@ -648,14 +646,14 @@ const Enrollment = () => {
           </div>
 
           <div className="modal-form-group">
-            <label htmlFor="courseId">Subject</label>
+            <label htmlFor="courseId">Course</label>
             <select
               id="courseId"
               name="courseId"
               value={enrollmentForm.courseId}
               onChange={handleEnrollmentFormChange}
             >
-              <option value="">Select subject</option>
+              <option value="">Select course</option>
               {courseOptions.map((course) => (
                 <option key={course.id} value={course.id}>
                   {course.code} - {course.title}

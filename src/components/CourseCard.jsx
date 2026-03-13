@@ -4,36 +4,36 @@ const termStyles = {
   Both: { background: 'rgba(128, 0, 0, 0.1)', color: 'var(--primary-maroon)' }
 };
 
-const SubjectCard = ({ subject, onView }) => {
-  const termStyle = termStyles[subject.termType] || termStyles.Semester;
+const CourseCard = ({ course, onView }) => {
+  const termStyle = termStyles[course.termType] || termStyles.Semester;
 
   return (
     <div className="course-card">
       <div className="course-header">
-        <h3>{subject.code}</h3>
+        <h3>{course.code}</h3>
         <span style={{ ...termStyle, padding: '6px 12px', borderRadius: '16px', fontSize: '12px', fontWeight: 600 }}>
-          {subject.termType}
+          {course.termType}
         </span>
       </div>
-      <h4>{subject.title}</h4>
+      <h4>{course.title}</h4>
 
       <div className="course-details">
         <div className="detail-row">
           <span className="label">Units:</span>
-          <span className="value">{subject.units}</span>
+          <span className="value">{course.units}</span>
         </div>
         <div className="detail-row">
           <span className="label">Semester/Term:</span>
-          <span className="value">{subject.semester}</span>
+          <span className="value">{course.semester}</span>
         </div>
         <div className="detail-row">
           <span className="label">Program:</span>
-          <span className="value">{subject.programName}</span>
+          <span className="value">{course.programName}</span>
         </div>
       </div>
 
       <div className="course-actions">
-        <button className="btn-outline" onClick={() => onView(subject)}>
+        <button className="btn-outline" onClick={() => onView(course)}>
           View Details
         </button>
       </div>
@@ -41,4 +41,4 @@ const SubjectCard = ({ subject, onView }) => {
   );
 };
 
-export default SubjectCard;
+export default CourseCard;

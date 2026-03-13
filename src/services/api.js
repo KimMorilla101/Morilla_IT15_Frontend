@@ -194,8 +194,8 @@ const normalizeOverview = (overview = {}) => {
 
 const buildCourseDistribution = () => {
   const distribution = enrollmentData.reduce((accumulator, item) => {
-    const courseCode = item.courseCode || item.subjectCode || 'N/A';
-    const courseName = item.courseName || item.subjectName || 'Unassigned Subject';
+    const courseCode = item.courseCode || 'N/A';
+    const courseName = item.courseName || 'Unassigned Course';
     const previous = accumulator.get(courseCode) || { name: courseCode, fullName: courseName, value: 0 };
 
     accumulator.set(courseCode, {

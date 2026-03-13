@@ -9,7 +9,6 @@ import {
   deleteStudent,
   fetchCourses,
   fetchStudents,
-  updateStudent,
 } from '../services/schoolApi';
 import '../styles/Pages.css';
 
@@ -245,28 +244,6 @@ const clearAuthSession = () => {
   localStorage.removeItem('profile');
 };
 
-const buildStudentForm = (student = null) => {
-  if (!student) {
-    return { ...EMPTY_STUDENT_FORM };
-  }
-
-  const statusValue = normalizeStatusValue(student.statusValue || student.statusLabel);
-
-  return {
-    studentNumber: student.studentId || '',
-    firstName: student.firstName || '',
-    lastName: student.lastName || '',
-    email: student.email === 'No email provided' ? '' : student.email,
-    department: student.department === 'Undeclared' ? '' : student.department,
-    yearLevel: statusValue === 'graduated' ? '' : student.year ? String(student.year) : '1',
-    gender: normalizeGenderValue(student.gender, 'female'),
-    dateOfBirth: student.dateOfBirth || '',
-    phoneNumber: student.phoneNumber === 'Not provided' ? '' : student.phoneNumber,
-    address: student.address === 'Not provided' ? '' : student.address,
-    status: statusValue,
-  };
-};
-
 const buildStudentPayload = (studentForm, currentStudent = null) => {
   const studentNumber = studentForm.studentNumber.trim();
   const firstName = studentForm.firstName.trim();
@@ -417,7 +394,6 @@ const Students = () => {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [showViewModal, setShowViewModal] = useState(false);
   const [showFormModal, setShowFormModal] = useState(false);
-  const [editingStudent, setEditingStudent] = useState(null);
   const [studentForm, setStudentForm] = useState({ ...EMPTY_STUDENT_FORM });
   const [formError, setFormError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -613,18 +589,16 @@ const Students = () => {
     setShowViewModal(true);
   };
 
-  const closeFormModal = () => {
-    setShowFormModal(false);
-    setEditingStudent(null);
+  const openCreateModal = () => {
     setStudentForm({ ...EMPTY_STUDENT_FORM });
     setFormError('');
+    setShowFormModal(true);
   };
 
-  const openEditModal = (student) => {
-    setEditingStudent(student);
-    setStudentForm(buildStudentForm(student));
+  const closeFormModal = () => {
+    setShowFormModal(false);
+    setStudentForm({ ...EMPTY_STUDENT_FORM });
     setFormError('');
-    setShowFormModal(true);
   };
 
   const handleStudentFormChange = (event) => {
@@ -679,13 +653,8 @@ const Students = () => {
     setFormError('');
 
     try {
-      const payload = buildStudentPayload(studentForm, editingStudent);
-
-      if (editingStudent?.id) {
-        await updateStudent(editingStudent.id, payload, 'PATCH');
-      } else {
-        await createStudent(payload);
-      }
+      const payload = buildStudentPayload(studentForm);
+      await createStudent(payload);
 
       closeFormModal();
       setPage(1);
@@ -807,9 +776,6 @@ const Students = () => {
                     <div className="action-buttons">
                       <button className="btn-sm btn-view" onClick={() => handleViewStudent(student)}>
                         View
-                      </button>
-                      <button className="btn-sm btn-edit" onClick={() => openEditModal(student)}>
-                        Edit
                       </button>
                     </div>
                   </td>
@@ -936,15 +902,6 @@ const Students = () => {
               <button className="modal-btn modal-btn-secondary" onClick={() => setShowViewModal(false)}>
                 Close
               </button>
-              <button
-                className="modal-btn modal-btn-primary"
-                onClick={() => {
-                  setShowViewModal(false);
-                  openEditModal(selectedStudent);
-                }}
-              >
-                Edit Student
-              </button>
             </div>
           </>
         )}
@@ -953,7 +910,7 @@ const Students = () => {
       <Modal
         isOpen={showFormModal}
         onClose={closeFormModal}
-        title={editingStudent ? 'Edit Student' : 'Add Student'}
+        title="Add Student"
         size="medium"
       >
         <form onSubmit={handleSubmitStudent}>
@@ -1110,7 +1067,7 @@ const Students = () => {
               Cancel
             </button>
             <button type="submit" className="modal-btn modal-btn-primary" disabled={isSubmitting}>
-              {isSubmitting ? 'Saving...' : editingStudent ? 'Save Changes' : 'Create Student'}
+              {isSubmitting ? 'Saving...' : 'Create Student'}
             </button>
           </div>
         </form>
