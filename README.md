@@ -19,7 +19,7 @@ This will install all required packages for the React project.
 3. Start the development server
 
 ```bash
-npm run dev
+npm start
 ```
 
 4. Open the application

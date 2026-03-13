@@ -29,6 +29,7 @@ const validateFields = (email, password) => {
 const Login = () => {
   const navigate = useNavigate();
   const navigationType = useNavigationType();
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://localhost/morilla_backend/api';
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -85,7 +86,7 @@ const Login = () => {
       
       // If it's a network error, provide more helpful debugging info
       if (!errorMessage || errorMessage.includes('Failed to fetch')) {
-        errorMessage = 'Backend server not responding. Make sure your Laravel server is running on http://127.0.0.1:8000';
+        errorMessage = `Backend server not responding. Make sure your Laravel server is running and reachable at ${apiBaseUrl}`;
       }
       
       setError(errorMessage);
