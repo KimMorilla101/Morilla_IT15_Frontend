@@ -43,8 +43,8 @@ Create or update `.env` with:
 ```env
 VITE_API_BASE_URL=https://localhost/morilla_backend/api
 VITE_USE_REMOTE_DASHBOARD=true
-VITE_USE_DEMO_MODE=false
-VITE_API_KEY=
+VITE_OPENWEATHER_API_KEY=your_openweather_api_key
+VITE_DEFAULT_WEATHER_CITY=Tagum
 ```
 
 ## API Documentation
