@@ -1,257 +1,369 @@
 # API Integration Guide
 
 ## Overview
-Your React app is now connected to your backend Laravel API with bearer token authentication and profile management.
+This document describes the backend API contract expected by the current frontend.
 
-## Services Created
+Base URL is read from environment variable `VITE_API_BASE_URL`.
+If not set, frontend defaults to:
 
-### `src/services/authApi.js`
-Centralized authentication service with the following functions:
+`https://localhost/morilla_backend/api`
 
-#### **login(email, password)**
-Calls `POST /api/login` to authenticate user
-- **Request**: `{ email, password }`
-- **Response**: `{ token, user: { id, name, email, ... } }`
-- **Auto-stores**: Bearer token in localStorage
-- **Usage**:
-```javascript
-import { login } from '../services/authApi';
+## Common Headers
 
-try {
-  const response = await login('user@example.com', 'password123');
-  console.log('Logged in:', response.user);
-} catch (error) {
-  console.error('Login failed:', error.message);
-}
-```
+- `Accept: application/json`
+- `Content-Type: application/json` for POST/PATCH/PUT
+- `Authorization: Bearer <token>` for protected endpoints
+- Optional: `X-API-KEY: <key>` when `VITE_API_KEY` is configured
 
-#### **fetchProfile()**
-Calls `GET /api/profile` to fetch authenticated user's profile
-- **Headers**: `Authorization: Bearer {token}` (auto-added)
-- **Response**: `{ user: { id, name, email, role, ... } }` or direct user object
-- **Auto-caches**: Profile in localStorage for fallback
-- **Usage**:
-```javascript
-import authApi from '../services/authApi';
+## Response Shape Compatibility
 
-try {
-  const profile = await authApi.fetchProfile();
-  console.log('User profile:', profile);
-} catch (error) {
-  console.error('Failed to fetch profile:', error.message);
-}
-```
+Frontend accepts flexible response shapes.
 
-#### **logout()**
-Calls `POST /api/logout` (optional backend support) and clears local session
-- **Auto-clears**: token, isAuthenticated, userId, profile from localStorage
-- **Usage**:
-```javascript
-import { logout } from '../services/authApi';
+Collection responses can be any of:
 
-await logout();
-// User is now logged out
-```
+- An array directly
+- Object containing `data`, `items`, `results`, `programs`, `students`, `courses`, or `enrollments` arrays
+- Nested array at `data.data` or `data.items`
 
-#### **updateProfile(profileData)**
-Calls `PUT /api/profile` to update user profile (optional)
-- **Request**: `{ name, email, ... }`
-- **Response**: Updated user object
-- **Usage**:
-```javascript
-await authApi.updateProfile({ name: 'New Name', email: 'newemail@example.com' });
-```
+Single-entity responses can be any of:
 
-#### **getAuthHeaders()**
-Helper function that returns headers with bearer token
-- **Returns**: `{ 'Content-Type': 'application/json', 'Authorization': 'Bearer {token}' }`
-- **Usage**: For custom fetch calls
-```javascript
-import { getAuthHeaders } from '../services/authApi';
+- Entity object directly
+- Object containing `data`
+- Object containing typed key such as `student`, `course`, `enrollment`
 
-const headers = getAuthHeaders();
-const response = await fetch('/api/custom-endpoint', {
-  method: 'GET',
-  headers,
-});
-```
+Pagination metadata is read from `meta` or root object fields:
 
-## Components Updated
+- `current_page` or `currentPage`
+- `last_page` or `lastPage`
+- `per_page` or `perPage`
+- `total`
 
-### `src/components/auth/Login.jsx`
-- Now uses `authApi.login()` instead of hardcoded fetch
-- Simplified error handling
-- Cleaner code flow
+## Authentication Endpoints
 
-### `src/components/ProfilePanel.jsx` (New)
-Floating profile dropdown in top-right corner showing:
-- User avatar (first letter of name)
-- User name
-- User email
-- User role (if available)
-- Refresh button to reload profile
-- Logout button
+### POST /login
 
-**Features**:
-- Auto-fetches profile on mount using `fetchProfile()`
-- Graceful fallback to cached profile if API fails
-- Click avatar to toggle dropdown
-- Click logout to clear session and redirect to login
+Request body:
 
-### `src/components/Topbar.jsx`
-- Integrated ProfilePanel component
-- Removed basic userId display
-
-### `src/components/Sidebar.jsx`
-- Updated logout to use `authApi.logout()`
-- Now properly clears all session data including token
-
-## API Endpoints Expected
-
-Your backend should provide these endpoints:
-
-### POST /api/login
-**Request:**
 ```json
 {
-  "email": "user@example.com",
+  "email": "admin@morilla.test",
   "password": "password123"
 }
 ```
 
-**Response (200 OK):**
+Expected success response:
+
 ```json
 {
-  "token": "eyJhbGciOiJIUzI1NiIs...",
+  "token": "jwt-token-string",
   "user": {
     "id": 1,
-    "name": "John Doe",
-    "email": "user@example.com",
-    "role": "student"
+    "name": "Admin User",
+    "email": "admin@morilla.test",
+    "role": "admin"
+  },
+  "profile": {
+    "id": 1,
+    "name": "Admin User",
+    "email": "admin@morilla.test"
   }
 }
 ```
 
----
+Minimum required by frontend: `token` and user identity (`user.id` preferred).
 
-### GET /api/profile
-**Headers:**
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
-Content-Type: application/json
-```
+### GET /profile
 
-**Response (200 OK):**
+Expected success response can be either:
+
 ```json
 {
   "user": {
     "id": 1,
-    "name": "John Doe",
-    "email": "user@example.com",
-    "role": "student",
-    "created_at": "2024-01-01T12:00:00Z"
+    "name": "Admin User",
+    "email": "admin@morilla.test",
+    "role": "admin"
   }
 }
 ```
-or alternatively:
+
+or direct profile object:
+
 ```json
 {
   "id": 1,
-  "name": "John Doe",
-  "email": "user@example.com",
-  "role": "student"
+  "name": "Admin User",
+  "email": "admin@morilla.test",
+  "role": "admin"
 }
 ```
 
----
+### PUT /profile
 
-### POST /api/logout (Optional)
-**Headers:**
-```
-Authorization: Bearer {token}
-```
+Request body:
 
-**Response (200 OK):**
-```json
-{
-  "message": "Logged out successfully"
-}
-```
-
----
-
-### PUT /api/profile (Optional)
-**Headers:**
-```
-Authorization: Bearer {token}
-Content-Type: application/json
-```
-
-**Request:**
 ```json
 {
   "name": "New Name",
-  "email": "newemail@example.com"
+  "email": "new@example.com"
 }
 ```
 
-**Response (200 OK):**
+Expected success response: updated profile/user object in any compatible shape.
+
+### POST /logout
+
+Optional backend endpoint.
+Any successful JSON response is accepted.
+
+## Dashboard Endpoint
+
+### GET /dashboard
+
+Expected success response (root or `data`):
+
 ```json
 {
-  "user": {
-    "id": 1,
-    "name": "New Name",
-    "email": "newemail@example.com"
+  "overview": {
+    "students_enrolled": 1200,
+    "courses_offered": 58,
+    "school_days_total": 124,
+    "average_attendance": 91.2
+  },
+  "monthlyEnrollment": [
+    { "month": "Aug", "enrollments": 230 }
+  ],
+  "courseDistribution": [
+    { "name": "Computer Science", "value": 320 }
+  ],
+  "recent_calendar": [
+    { "id": 1, "title": "Midterm Exam", "date": "2026-03-15", "type": "event" }
+  ]
+}
+```
+
+Alternative keys also supported by frontend:
+
+- `courses_by_department`
+- `students_by_department`
+- `enrollmentTrends`
+- `recentActivities`
+- `calendar`
+
+## Students Endpoints
+
+### GET /students
+
+Query params supported by frontend:
+
+- `search`
+- `department`
+- `year_level`
+- `course_id`
+- `page`
+- `per_page`
+
+Expected response: students collection + optional pagination metadata.
+
+### GET /students/{id}
+
+Expected response: student object (direct or wrapped).
+
+### POST /students
+
+Frontend payload (typical):
+
+```json
+{
+  "student_number": "2026-0001",
+  "student_id": "2026-0001",
+  "id_number": "2026-0001",
+  "first_name": "Juan",
+  "last_name": "Dela Cruz",
+  "full_name": "Juan Dela Cruz",
+  "email": "juan@example.com",
+  "department": "Computer Science",
+  "year_level": 1,
+  "status": "active",
+  "gender": "male",
+  "sex": "male",
+  "date_of_birth": "2000-01-01",
+  "phone_number": "09123456789",
+  "address": "Tagum City",
+  "course_ids": [1, 2]
+}
+```
+
+Compatibility aliases may also be present:
+
+- `studentNumber`
+- `yearLevel`
+- `dateOfBirth`
+
+Expected response: created student object.
+
+### PATCH /students/{id}
+
+Expected response: updated student object.
+
+### DELETE /students/{id}
+
+Expected response: any success JSON payload.
+
+## Courses Endpoints
+
+### GET /courses
+
+Query params supported by frontend:
+
+- `search`
+- `department`
+- `semester`
+- `active`
+- `page`
+- `per_page`
+
+Expected response: courses collection + optional pagination metadata.
+
+### GET /courses/{id}
+
+Expected response: course object (direct or wrapped).
+
+### POST /courses
+
+Frontend payload (typical):
+
+```json
+{
+  "course_code": "CS101",
+  "code": "CS101",
+  "title": "Intro to Programming",
+  "name": "Intro to Programming",
+  "department": "Computer Science",
+  "semester": "1st Semester",
+  "credits": 3,
+  "units": 3,
+  "capacity": 40,
+  "max_students": 40,
+  "maxStudents": 40,
+  "instructor": "Prof. Juan Dela Cruz",
+  "status": "active",
+  "active": true,
+  "is_active": 1,
+  "isActive": true,
+  "description": "Course overview"
+}
+```
+
+Expected response: created course object.
+
+### PATCH /courses/{id}
+
+Payload and response shape follow POST /courses.
+
+### Semester validation compatibility
+
+Frontend retries course requests with alternate semester formats if backend returns an invalid semester error.
+Examples retried include:
+
+- `1st Semester`, `First Semester`, `first_semester`, `1`
+- `2nd Semester`, `Second Semester`, `second_semester`, `2`
+- `Summer`, `summer_term`, `3`
+
+## Program Endpoints (Frontend Alias)
+
+Frontend program APIs are mapped to courses:
+
+- `fetchPrograms` -> GET `/courses`
+- `fetchProgram` -> GET `/courses/{id}`
+- `createProgram` -> POST `/courses`
+- `updateProgram` -> PATCH `/courses/{id}`
+
+## Enrollment Endpoints
+
+Primary paths used by frontend:
+
+1. `/enrollments`
+2. Fallback to `/student-enrollments` when status is 404 or 405
+
+### GET /enrollments
+
+Query params:
+
+- `search`
+- `status`
+- `semester`
+- `student_id`
+- `course_id`
+- `page`
+- `per_page`
+
+Expected response: enrollments collection + optional pagination metadata.
+
+### POST /enrollments
+
+Request body:
+
+```json
+{
+  "student_id": 1,
+  "course_id": 10,
+  "semester": "1st Semester",
+  "status": "enrolled",
+  "enrollment_date": "2026-03-13"
+}
+```
+
+Compatibility aliases may also be present:
+
+- `studentId`
+- `courseId`
+- `enrollmentDate`
+
+Expected response: enrollment object (direct or wrapped in `enrollment`).
+
+### PATCH /enrollments/{id}
+
+Request body uses the same base fields as POST and can include:
+
+- `previous_student_id`
+- `previous_course_id`
+
+Expected response: enrollment object (direct or wrapped).
+
+### Enrollment fallback behavior
+
+If both enrollment endpoints are unavailable (404/405), frontend falls back by editing student course assignments via:
+
+- GET `/students/{id}`
+- PATCH `/students/{id}` with `course_ids`
+
+## Error Response Format
+
+Frontend expects one of these top-level fields for message display:
+
+- `message`
+- `error`
+
+Validation details are read from `errors` object when present.
+
+Typical Laravel validation response:
+
+```json
+{
+  "message": "The given data was invalid.",
+  "errors": {
+    "email": ["The email field is required."],
+    "password": ["The password field is required."]
   }
 }
 ```
 
-## Configuration
+## Environment Variables
 
-### Environment Variables
-Set in `.env`:
-```
+```env
 VITE_API_BASE_URL=https://localhost/morilla_backend/api
+VITE_API_KEY=
+VITE_USE_DEMO_MODE=false
+VITE_USE_REMOTE_DASHBOARD=true
 ```
-
-If not set, defaults to: `https://localhost/morilla_backend/api`
-
-## Token Storage
-
-### localStorage Keys
-- **token** - Bearer token for API requests
-- **isAuthenticated** - Boolean flag ('true'/'false')
-- **userId** - User ID from server
-- **profile** - Cached user profile object
-
-### Security Notes
-- ✅ Token automatically cleared on logout
-- ✅ Token cleared on back-navigation to prevent cached access
-- ✅ Protected routes verify both token and isAuthenticated flag
-- ✅ Bearer token auto-added to all authenticated API calls
-- ⚠️ localStorage is accessible to XSS - only store non-sensitive data here
-- 💡 Consider using httpOnly cookies for production (requires backend support)
-
-## Error Handling
-
-All API calls use consistent error handling:
-
-```javascript
-try {
-  const profile = await authApi.fetchProfile();
-} catch (error) {
-  console.error('Status:', error.status);        // HTTP status code
-  console.error('Message:', error.message);      // Error message
-  console.error('Payload:', error.payload);      // Full API response
-}
-```
-
-## Next Steps (Optional)
-
-You mentioned these options - let me know which you'd like:
-
-1. **Generate React axios/fetch service for these endpoints** - Already done! Use `authApi.js`
-2. **Add API filters/search examples for React dashboard tables** - Would create searchable/filterable tables with API integration examples
-3. **Add pagination/sorting docs** - Would add pagination and sorting to dashboard tables with backend support
-
-Choose which feature you'd like next! 🚀
