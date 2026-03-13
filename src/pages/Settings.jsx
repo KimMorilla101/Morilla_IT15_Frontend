@@ -93,8 +93,8 @@ const Settings = () => {
             <label>API Base URL</label>
             <input 
               type="text" 
-              placeholder="http://localhost:8000/api" 
-              defaultValue="http://localhost:8000/api"
+              placeholder="https://localhost/morilla_backend/api" 
+              defaultValue="https://localhost/morilla_backend/api"
             />
           </div>
           

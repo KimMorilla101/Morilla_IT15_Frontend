@@ -48,6 +48,19 @@
   box-shadow: 0 6px 20px rgba(128, 0, 0, 0.3);
 }
 
+.page-alert {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding: 14px 18px;
+  border-radius: 14px;
+  border: 1px solid rgba(239, 68, 68, 0.18);
+  background: rgba(239, 68, 68, 0.08);
+  color: #991b1b;
+}
+
 .page-controls {
   display: flex;
   gap: 16px;
@@ -205,6 +218,12 @@
   transition: all 0.3s ease;
 }
 
+.btn-sm:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
 .btn-view {
   background: rgba(128, 0, 0, 0.1);
   color: var(--primary-maroon);
@@ -229,7 +248,56 @@
   text-align: center;
 }
 
+.pagination-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
 .pagination-info {
+  color: #666;
+  font-size: 14px;
+}
+
+.pagination-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pagination-page {
+  color: var(--text-dark);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.table-placeholder {
+  padding: 28px 16px;
+  text-align: center;
+  color: #666;
+}
+
+.student-course-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.student-course-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(128, 0, 0, 0.08);
+  color: var(--primary-maroon);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.empty-detail-text {
+  margin: 0;
   color: #666;
   font-size: 14px;
 }
@@ -717,6 +785,23 @@
   font-size: 13px;
   color: #666;
   margin: 0;
+}
+
+@media (max-width: 768px) {
+  .page-alert {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .pagination-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .pagination-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
 }
 
 .btn-configure {

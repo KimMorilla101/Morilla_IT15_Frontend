@@ -6,6 +6,7 @@ import EnrollmentChart from './EnrollmentChart';
 import CourseDistributionChart from './CourseDistributionChart';
 import AttendanceChart from './AttendanceChart';
 import { DashboardProvider } from './DashboardContext';
+import FloatingChat from '../FloatingChat';
 import '../../styles/Dashboard.css';
 
 const EMPTY_OVERVIEW = {
@@ -167,6 +168,8 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
+
+        <FloatingChat />
       </div>
     </DashboardProvider>
   );

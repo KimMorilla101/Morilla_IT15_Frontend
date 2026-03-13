@@ -7,10 +7,7 @@ import {
   X,
   Layers,
   Users,
-  ClipboardList,
   CalendarDays,
-  BarChart3,
-  Settings,
 } from 'lucide-react';
 import { fetchProfile, getStoredProfile, logout } from '../services/authApi';
 import '../styles/Sidebar.css';
@@ -87,12 +84,9 @@ const Sidebar = ({ isOpen, closeSidebar }) => {
   const menuItems = [
     { path: '/dashboard', icon: Home, label: 'Dashboard' },
     { path: '/students', icon: Users, label: 'Students' },
-    { path: '/programs', icon: Layers, label: 'Programs' },
+    { path: '/programs', icon: Layers, label: 'Courses' },
     { path: '/subjects', icon: BookOpen, label: 'Subjects' },
-    { path: '/enrollment', icon: ClipboardList, label: 'Enrollment' },
     { path: '/academic-calendar', icon: CalendarDays, label: 'Academic Calendar' },
-    { path: '/reports', icon: BarChart3, label: 'Reports' },
-    { path: '/settings', icon: Settings, label: 'Settings' },
   ];
 
   const handleNavClick = () => {

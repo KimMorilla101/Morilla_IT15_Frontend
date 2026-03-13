@@ -211,10 +211,10 @@ Content-Type: application/json
 ### Environment Variables
 Set in `.env`:
 ```
-VITE_API_BASE_URL=http://localhost:8000/api
+VITE_API_BASE_URL=https://localhost/morilla_backend/api
 ```
 
-If not set, defaults to: `http://127.0.0.1:8000/api`
+If not set, defaults to: `https://localhost/morilla_backend/api`
 
 ## Token Storage
 

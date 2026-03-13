@@ -6,7 +6,7 @@ import {
   studentsData,
 } from '../data/mockData';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://localhost/morilla_backend/api';
 const API_KEY = import.meta.env.VITE_API_KEY || '';
 const DASHBOARD_TIMEOUT_MS = 12000;
 const REMOTE_DASHBOARD_ENABLED = import.meta.env.VITE_USE_REMOTE_DASHBOARD !== 'false';
