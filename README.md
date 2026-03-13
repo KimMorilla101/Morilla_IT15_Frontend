@@ -6,7 +6,7 @@ React + Vite frontend for enrollment, student, course, subject, and dashboard ma
 1. Navigate to the frontend folder
 
 ```bash
-cd react-frontend
+cd Morilla_IT15_Frontend-main
 ```
 
 2. Install dependencies
