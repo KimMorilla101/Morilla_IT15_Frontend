@@ -96,9 +96,9 @@ const Sidebar = ({ isOpen, closeSidebar }) => {
   };
 
   return (
-    <aside className={`sidebar ${isOpen ? 'sidebar-open' : ''}`}>
+    <aside className={`sidebar d-flex flex-column ${isOpen ? 'sidebar-open' : ''}`}>
       <div className="sidebar-header">
-        <button className="sidebar-close-btn" onClick={closeSidebar}>
+        <button type="button" className="sidebar-close-btn btn btn-sm btn-light" onClick={closeSidebar} aria-label="Close navigation">
           <X size={24} />
         </button>
         <div className="logo">
@@ -119,7 +119,7 @@ const Sidebar = ({ isOpen, closeSidebar }) => {
           <NavLink
             key={item.path}
             to={item.path}
-            className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+            className={({ isActive }) => `nav-item d-flex align-items-center gap-2 ${isActive ? 'active' : ''}`}
             onClick={handleNavClick}
           >
             <item.icon size={20} />
@@ -129,7 +129,7 @@ const Sidebar = ({ isOpen, closeSidebar }) => {
       </nav>
 
       <div className="sidebar-footer">
-        <div className="sidebar-profile-card sidebar-profile-card-footer">
+        <div className="sidebar-profile-card sidebar-profile-card-footer d-flex align-items-center">
           <div className="sidebar-profile-avatar" style={avatarStyle}>
             {avatarInitials}
           </div>
@@ -139,7 +139,7 @@ const Sidebar = ({ isOpen, closeSidebar }) => {
           </div>
         </div>
 
-        <button onClick={handleLogout} className="logout-btn">
+        <button type="button" onClick={handleLogout} className="logout-btn btn btn-outline-danger d-flex align-items-center justify-content-center gap-2">
           <LogOut size={20} />
           <span>Logout</span>
         </button>

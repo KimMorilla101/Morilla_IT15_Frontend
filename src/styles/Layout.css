@@ -31,7 +31,7 @@
 
 .main-content {
   flex: 1;
-  margin-left: 260px;
+  margin-left: 272px;
   min-height: 100vh;
   overflow-y: auto;
   transition: margin-left 0.3s ease;
@@ -46,7 +46,7 @@
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(2px);
-  z-index: 99;
+  z-index: 1038;
   animation: fadeIn 0.3s ease;
 }
 
@@ -63,12 +63,17 @@
 
   .sidebar-overlay {
     display: block;
+    top: 70px;
   }
 }
 
 @media (max-width: 768px) {
   .main-content {
     margin-top: 60px;
+  }
+
+  .sidebar-overlay {
+    top: 60px;
   }
 
   .app-layout::before,

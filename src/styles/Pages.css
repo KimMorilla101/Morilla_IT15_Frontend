@@ -124,13 +124,15 @@
   backdrop-filter: blur(15px);
   border-radius: 20px;
   border: 1px solid rgba(128, 0, 0, 0.1);
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .data-table {
   width: 100%;
   border-collapse: collapse;
+  min-width: 980px;
 }
 
 .data-table thead {
@@ -152,6 +154,11 @@
   border-top: 1px solid rgba(128, 0, 0, 0.05);
   font-size: 14px;
   color: var(--text-dark);
+}
+
+.data-table th:last-child,
+.data-table td:last-child {
+  padding-right: 24px;
 }
 
 .data-table tbody tr {
@@ -206,6 +213,8 @@
 .action-buttons {
   display: flex;
   gap: 8px;
+  align-items: center;
+  white-space: nowrap;
 }
 
 .btn-sm {

@@ -16,10 +16,10 @@ const Layout = () => {
   };
 
   return (
-    <div className="app-layout">
+    <div className="app-layout d-flex">
       <Navbar toggleSidebar={toggleSidebar} />
       <Sidebar isOpen={isSidebarOpen} closeSidebar={closeSidebar} />
-      <main className="main-content">
+      <main className="main-content container-fluid px-3 px-md-4">
         <Outlet />
       </main>
       {isSidebarOpen && <div className="sidebar-overlay" onClick={closeSidebar}></div>}

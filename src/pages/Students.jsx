@@ -17,6 +17,13 @@ const STUDENTS_PER_PAGE = 15;
 const STUDENT_TARGET_COUNT = 500;
 const STUDENT_FETCH_BATCH_SIZE = 100;
 const CHANG_BATIS_KEYWORDS = ['chang batis', 'changbatis'];
+const MAX_YEAR_LEVEL = 4;
+const YEAR_LEVEL_UNIT_REQUIREMENTS = {
+  1: 26,
+  2: 26,
+  3: 26,
+  4: 10,
+};
 
 const EMPTY_STUDENT_FORM = {
   studentNumber: '',
@@ -68,6 +75,56 @@ const normalizeStatusValue = (value = '') => {
   }
 
   return 'active';
+};
+
+const normalizeYearLevel = (value, fallback = null) => {
+  const parsed = Number(value);
+
+  if (!Number.isFinite(parsed)) {
+    return fallback;
+  }
+
+  return Math.min(MAX_YEAR_LEVEL, Math.max(1, Math.round(parsed)));
+};
+
+const formatYearLevelLabel = (yearLevel, statusValue = '') => {
+  if (statusValue === 'graduated') {
+    return 'Graduated';
+  }
+
+  if (!yearLevel) {
+    return 'Not provided';
+  }
+
+  if (yearLevel === 1) {
+    return '1st Year';
+  }
+
+  if (yearLevel === 2) {
+    return '2nd Year';
+  }
+
+  if (yearLevel === 3) {
+    return '3rd Year';
+  }
+
+  return '4th Year';
+};
+
+const getRequiredUnitsForYear = (yearLevel) => YEAR_LEVEL_UNIT_REQUIREMENTS[yearLevel] || 0;
+
+const resolveStudentUnits = ({ statusValue, yearLevel, courseUnits = 0, fallbackUnits = 0 }) => {
+  if (statusValue === 'graduated') {
+    return 0;
+  }
+
+  const requiredUnits = getRequiredUnitsForYear(yearLevel);
+  if (requiredUnits > 0) {
+    return requiredUnits;
+  }
+
+  const resolvedUnits = Number(courseUnits || fallbackUnits || 0);
+  return Number.isFinite(resolvedUnits) && resolvedUnits > 0 ? resolvedUnits : 0;
 };
 
 const normalizeGenderValue = (value = '', fallback = 'female') => {
@@ -135,8 +192,19 @@ const mapStudent = (student) => {
     'Unnamed Student';
   const fallbackName = splitFullName(fullName);
   const courses = Array.isArray(student?.courses) ? student.courses : [];
-  const enrolledUnits = courses.reduce((total, course) => total + Number(course?.credits || 0), 0);
-  const statusLabel = formatStatusLabel(student?.status);
+  const statusValue = normalizeStatusValue(student?.status);
+  const normalizedYear =
+    statusValue === 'graduated'
+      ? null
+      : normalizeYearLevel(student?.year_level ?? student?.year ?? student?.yearLevel, null);
+  const courseUnits = courses.reduce((total, course) => total + Number(course?.credits ?? course?.units ?? 0), 0);
+  const enrolledUnits = resolveStudentUnits({
+    statusValue,
+    yearLevel: normalizedYear,
+    courseUnits,
+    fallbackUnits: Number(student?.enrolled_units ?? student?.enrolledUnits ?? 0),
+  });
+  const statusLabel = formatStatusLabel(statusValue);
   const genderValue = normalizeGenderValue(student?.gender || student?.sex || '', '');
 
   return {
@@ -147,11 +215,12 @@ const mapStudent = (student) => {
     lastName: student?.last_name || fallbackName.lastName,
     email: student?.email || 'No email provided',
     department: student?.department || 'Undeclared',
-    year: Number(student?.year_level || 0),
+    year: normalizedYear,
+    yearLevelLabel: formatYearLevelLabel(normalizedYear, statusValue),
     enrolledUnits,
     statusLabel,
-    statusValue: normalizeStatusValue(student?.status),
-    statusTone: getStatusTone(student?.status),
+    statusValue,
+    statusTone: getStatusTone(statusValue),
     gender: genderValue,
     genderLabel: formatGenderLabel(genderValue),
     dateOfBirth: student?.date_of_birth || null,
@@ -181,18 +250,20 @@ const buildStudentForm = (student = null) => {
     return { ...EMPTY_STUDENT_FORM };
   }
 
+  const statusValue = normalizeStatusValue(student.statusValue || student.statusLabel);
+
   return {
     studentNumber: student.studentId || '',
     firstName: student.firstName || '',
     lastName: student.lastName || '',
     email: student.email === 'No email provided' ? '' : student.email,
     department: student.department === 'Undeclared' ? '' : student.department,
-    yearLevel: student.year ? String(student.year) : '1',
+    yearLevel: statusValue === 'graduated' ? '' : student.year ? String(student.year) : '1',
     gender: normalizeGenderValue(student.gender, 'female'),
     dateOfBirth: student.dateOfBirth || '',
     phoneNumber: student.phoneNumber === 'Not provided' ? '' : student.phoneNumber,
     address: student.address === 'Not provided' ? '' : student.address,
-    status: normalizeStatusValue(student.statusValue || student.statusLabel),
+    status: statusValue,
   };
 };
 
@@ -203,7 +274,7 @@ const buildStudentPayload = (studentForm, currentStudent = null) => {
   const fullName = `${firstName} ${lastName}`.trim();
   const department = studentForm.department.trim();
   const status = normalizeStatusValue(studentForm.status);
-  const yearLevel = Math.max(1, Number(studentForm.yearLevel || 1));
+  const yearLevel = status === 'graduated' ? null : normalizeYearLevel(studentForm.yearLevel, 1);
   const gender = normalizeGenderValue(studentForm.gender, 'female');
   const courseIds = Array.isArray(currentStudent?.courses)
     ? currentStudent.courses.map((course) => Number(course?.id)).filter((id) => Number.isFinite(id))
@@ -280,6 +351,14 @@ const isChangBatisStudent = (student = {}) => {
 const mapMockStudent = (student) => {
   const firstName = student?.name?.split(' ')?.slice(0, -1).join(' ') || student?.name || '';
   const lastName = student?.name?.split(' ')?.slice(-1).join(' ') || '';
+  const statusValue = normalizeStatusValue(student.status || 'active');
+  const normalizedYear =
+    statusValue === 'graduated' ? null : normalizeYearLevel(student?.year ?? student?.yearLevel, null);
+  const enrolledUnits = resolveStudentUnits({
+    statusValue,
+    yearLevel: normalizedYear,
+    fallbackUnits: Number(student.enrolledUnits || 0),
+  });
 
   return {
     id: `mock-${student.id}`,
@@ -289,11 +368,12 @@ const mapMockStudent = (student) => {
     lastName,
     email: student.email || 'No email provided',
     department: student.department || 'Undeclared',
-    year: Number(student.year || 0),
-    enrolledUnits: Number(student.enrolledUnits || 0),
-    statusLabel: formatStatusLabel(student.status || 'active'),
-    statusValue: normalizeStatusValue(student.status || 'active'),
-    statusTone: getStatusTone(student.status || 'active'),
+    year: normalizedYear,
+    yearLevelLabel: formatYearLevelLabel(normalizedYear, statusValue),
+    enrolledUnits,
+    statusLabel: formatStatusLabel(statusValue),
+    statusValue,
+    statusTone: getStatusTone(statusValue),
     gender: normalizeGenderValue(student.gender, ''),
     genderLabel: formatGenderLabel(student.gender),
     dateOfBirth: student.birthDate || null,
@@ -549,10 +629,30 @@ const Students = () => {
 
   const handleStudentFormChange = (event) => {
     const { name, value } = event.target;
-    setStudentForm((current) => ({
-      ...current,
-      [name]: value,
-    }));
+    setStudentForm((current) => {
+      const next = {
+        ...current,
+        [name]: value,
+      };
+
+      if (name === 'status') {
+        const normalizedStatus = normalizeStatusValue(value);
+        next.status = normalizedStatus;
+
+        if (normalizedStatus === 'graduated') {
+          next.yearLevel = '';
+        } else if (!current.yearLevel) {
+          next.yearLevel = '1';
+        }
+      }
+
+      if (name === 'yearLevel') {
+        const normalizedYear = normalizeYearLevel(value, 1);
+        next.yearLevel = normalizedYear ? String(normalizedYear) : '';
+      }
+
+      return next;
+    });
   };
 
   const handleSubmitStudent = async (event) => {
@@ -698,8 +798,8 @@ const Students = () => {
                     </div>
                   </td>
                   <td>{student.department}</td>
-                  <td>{student.year || 'N/A'}</td>
-                  <td>{student.enrolledUnits}</td>
+                  <td>{student.yearLevelLabel}</td>
+                  <td>{student.enrolledUnits} units</td>
                   <td>
                     <span className={`status-badge ${student.statusTone}`}>{student.statusLabel}</span>
                   </td>
@@ -780,9 +880,7 @@ const Students = () => {
             <div className="modal-info-grid">
               <div className="modal-info-item">
                 <span className="modal-info-label">Year Level</span>
-                <span className="modal-info-value">
-                  {selectedStudent.year ? `Year ${selectedStudent.year}` : 'Not provided'}
-                </span>
+                <span className="modal-info-value">{selectedStudent.yearLevelLabel}</span>
               </div>
               <div className="modal-info-item">
                 <span className="modal-info-label">Enrolled Units</span>
@@ -825,7 +923,7 @@ const Students = () => {
                 <div className="student-course-list">
                   {selectedStudent.courses.map((course) => (
                     <span key={`${selectedStudent.id}-${course.id}`} className="student-course-chip">
-                      {course.code} - {course.title} ({course.credits} units)
+                      {course.code} - {course.title} ({Number(course.credits ?? course.units ?? 0)} units)
                     </span>
                   ))}
                 </div>
@@ -945,12 +1043,15 @@ const Students = () => {
                 name="yearLevel"
                 value={studentForm.yearLevel}
                 onChange={handleStudentFormChange}
+                disabled={studentForm.status === 'graduated'}
               >
+                {studentForm.status === 'graduated' ? (
+                  <option value="">Not Applicable (Graduated)</option>
+                ) : null}
                 <option value="1">1st Year</option>
                 <option value="2">2nd Year</option>
                 <option value="3">3rd Year</option>
                 <option value="4">4th Year</option>
-                <option value="5">5th Year</option>
               </select>
             </div>
             <div className="modal-form-group">

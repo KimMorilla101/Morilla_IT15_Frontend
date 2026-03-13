@@ -86,8 +86,8 @@ const Dashboard = () => {
 
   return (
     <DashboardProvider value={contextValue}>
-      <div className="dashboard">
-        <div className="dashboard-header">
+      <div className="dashboard container-fluid px-0">
+        <div className="dashboard-header d-flex flex-wrap align-items-start justify-content-between gap-3">
           <div>
             <h1>Dashboard</h1>
             <p>Enrollment trends, course distribution, attendance, and weather insights.</p>
